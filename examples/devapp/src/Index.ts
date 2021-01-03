@@ -1,4 +1,4 @@
-import { interfaces } from 'tbus';
+import { interfaces } from 'message-bus.core';
 import EventCreated from './Messages/EventCreated';
 import { TYPES } from "./Config/Types";
 import { Container } from 'inversify';

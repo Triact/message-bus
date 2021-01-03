@@ -1,11 +1,11 @@
 {
-  "name": "tbus-devapp",
+  "name": "devapp",
   "version": "1.0.0",
   "description": "",
   "main": "index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "link": "npm link ../tbus",
+    "link": "npm link ../../message-bus.core",
     "start_dev": "set NODE_ENV=dev&& nodemon src/Index.ts"
   },
   "author": "",
