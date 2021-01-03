@@ -1,0 +1,8 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+/**/.vs
+/**/node_modules
+**/*.suo
+**/package-lock.json
+/dist
+/**/.env.*

@@ -1,0 +1,28 @@
+{
+  "name": "tbus",
+  "version": "1.0.0",
+  "description": "",
+  "main": "lib/index",
+  "author": "triact",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "clean": "IF exist lib (rmdir /q /s lib) && mkdir lib",
+    "dev": "tsc -w",
+    "build": "tsc",
+    "prepublish": "npm run clean && npm run build",
+    "refreshVSToken": "vsts-npm-auth -C .npmrc -T .npmrc"
+  },
+  "license": "ISC",
+  "peerDependencies": {
+    "inversify": "^5.0.5",
+    "reflect-metadata": "^0.1.13"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.820.0",
+    "inversify": "^5.0.5",
+    "reflect-metadata": "^0.1.13"
+  },
+  "devDependencies": {
+    "typescript": "^4.1.3"
+  }
+}

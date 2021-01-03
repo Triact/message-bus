@@ -1,0 +1,7 @@
+{
+    "watch": ["src", "node_modules"],
+    "ext": "ts,json",
+    "ignore": ["src/**/*.spec.ts"],
+    "ignoreRoot": [".git"],
+    "exec": "ts-node ./src/index.ts"
+}

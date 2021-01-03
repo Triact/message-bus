@@ -1,0 +1,35 @@
+{
+	"compilerOptions": {
+		"outDir": "./lib",
+		//"target": "es6",
+		"target": "es6",
+		"module": "commonjs",
+		//"noImplicitAny": true,
+		"noUnusedLocals": false,
+		"noUnusedParameters": false,
+		"strictNullChecks": true,
+		"removeComments": true,
+		//"declaration": true,
+		//"sourceMap": true,
+		"experimentalDecorators": true,
+		//"jsx": "react",
+		//"skipLibCheck": true,
+		//"typeRoots": [
+		//	"index.d.ts",
+		//	"node_modules/@types"
+		//],
+		"rootDir": "./src",
+		"moduleResolution": "node",
+		"resolveJsonModule": true
+	},
+	//"include": [
+		//"./src/**/*.tsx",
+		//"./src/**/*.ts"
+	//],
+	//"exclude": [
+		//"node_modules"
+	//],
+	//"lib": [
+		//"es2017"
+	//]
+}
