@@ -2,7 +2,7 @@
 
 /**/.vs
 /**/node_modules
-**/*.suo
-**/package-lock.json
-/dist
+/**/*.suo
+/**/package-lock.json
+/**/dist
 /**/.env.*
