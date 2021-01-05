@@ -1,6 +1,6 @@
 import { Container } from "inversify";
 import { TYPES } from "./types";
-import { interfaces, Endpoint, AmazonTransport } from 'message-bus.core';
+import { interfaces, Endpoint, AmazonTransport, FakeTransport } from 'message-bus.core';
 import EventCreated from "../Messages/EventCreated";
 import * as AWS from 'aws-sdk';
 
@@ -22,7 +22,8 @@ export class Composer {
         });
 
         const endpoint = new Endpoint();
-        endpoint.useTransport<AmazonTransport>(new AmazonTransport(awsConfig));
+        //endpoint.useTransport<AmazonTransport>(new AmazonTransport(awsConfig));
+        endpoint.useTransport<FakeTransport>(new FakeTransport());
         endpoint.routes(routing => {
             routing.routeToTopic<EventCreated>(EventCreated, `arn:aws:sns:${awsConfig.region}:${process.env.AWS_ACCOUNT_ID}:tijdprikker_event-created`);
         });

@@ -1,6 +1,6 @@
-import { _event } from 'message-bus.core';
+import { event } from 'message-bus.core';
 
-@_event(Symbol.for('Eventcreated'))
+@event(Symbol.for('Eventcreated'))
 export default class EventCreated {
     eventId: string;
 }

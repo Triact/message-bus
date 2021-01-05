@@ -11,10 +11,6 @@ console.log("Starting...");
 
 customEnv.env(true);
 
-console.log("### Process:", process.env.AWS_PROFILE)
-
-
-
 //AWS.config.credentials = awsCredentials;
 //AWS.config.update({region: 'eu-west-1'});
 

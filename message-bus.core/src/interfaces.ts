@@ -14,6 +14,10 @@ declare namespace interfaces {
         routeToTopic<T>(ctor: new (...args: any[]) => T, topic: string): void;
         getDestination<T>(msg: T): { msgType: string, topic: string };
     }
+
+    // const MEssagePurposes = {
+    //     EVENT: 'event'
+    // };
 }
 
 export { interfaces };

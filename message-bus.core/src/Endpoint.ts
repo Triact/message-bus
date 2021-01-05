@@ -9,14 +9,16 @@ export default class Endpoint {
     private transport: interfaces.ITransport;
 
     constructor() {
-        console.log('###', (AWS.config.credentials as any).profile);
+        //console.log('###', (AWS.config.credentials as any).profile);
     }
 
     useTransport = <T extends interfaces.ITransport>(transport: T) => {
+        if (!transport) throw new Error(`Argument 'transport' cannot be null.`);
         this.transport = transport;
     }
 
     routes = (callback: (routing: Routing) => void) => {
+        if (!callback) throw Error(`Argument 'callback' cannot be null.`);
         callback(this.routing);
     } 
 
