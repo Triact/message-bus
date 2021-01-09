@@ -1,6 +1,8 @@
 export { default as Endpoint } from './Endpoint';
 export { interfaces } from './interfaces';
-export { event } from './decorators/messageDecorators';
+
+// Message decorators
+export { event, command } from './decorators/messageDecorators';
 
 // Transports
 export { AmazonTransport } from './transports/AmazonTransport';

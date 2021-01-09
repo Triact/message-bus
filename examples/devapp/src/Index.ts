@@ -1,5 +1,6 @@
 import { interfaces } from 'message-bus.core';
 import EventCreated from './Messages/EventCreated';
+import CreateEvent from './Messages/CreateEvent';
 import { TYPES } from "./Config/Types";
 import { Container } from 'inversify';
 import { Composer } from './Config/Composer';
@@ -22,6 +23,11 @@ composer.compose();
 
 const bus = container.get<interfaces.IBus>(TYPES.IBus);
 
-bus.publish<EventCreated>(EventCreated, (m: EventCreated) => { 
-    m.eventId = 'blabla'; 
-});
+// bus.publish<EventCreated>(EventCreated, (m: EventCreated) => { 
+//     m.eventId = 'blabla'; 
+// });
+
+bus.send<CreateEvent>(CreateEvent, (m: CreateEvent) => {
+    m.eventId = '1';
+    m.name = 'Test event';
+})

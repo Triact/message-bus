@@ -1,7 +1,8 @@
 import { Container } from "inversify";
 import { TYPES } from "./types";
 import { interfaces, Endpoint, AmazonTransport, FakeTransport } from 'message-bus.core';
-import EventCreated from "../Messages/EventCreated";
+import EventCreated from '../Messages/EventCreated';
+import CreateEvent from '../Messages/CreateEvent';
 import * as AWS from 'aws-sdk';
 
 export class Composer {
@@ -26,6 +27,7 @@ export class Composer {
         endpoint.useTransport<FakeTransport>(new FakeTransport());
         endpoint.routes(routing => {
             routing.routeToTopic<EventCreated>(EventCreated, `arn:aws:sns:${awsConfig.region}:${process.env.AWS_ACCOUNT_ID}:tijdprikker_event-created`);
+            routing.routeToEndpoint<CreateEvent>(CreateEvent, `https://sqs.${awsConfig.region}.amazonaws.com/${process.env.AWS_ACCOUNT_ID}/tijdprikker_SlackNotifier`);
         });
         const bus = endpoint.sendOnly();
 

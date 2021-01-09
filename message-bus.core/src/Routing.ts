@@ -3,24 +3,37 @@ import { interfaces } from './interfaces';
 export class Routing implements interfaces.IRouting {
     routes: any = {};
 
-    // routeToTopic<T>(messageType: interfaces.MessageType, topic: string): void {
-    //     this.routes[messageType] = topic;
-    // }
-
-    routeToTopic<T>(msgCtor: new (...args: any[]) => T, topic: string): void {
+    routeToTopic = <T>(msgCtor: new (...args: any[]) => T, topic: string) => {
         if (!msgCtor) throw new Error(`Argumen 'msgCtor' cannot be null.`);
         if (!topic) throw new Error(`Argument 'topic' cannot be null.`);
 
         const msg = new msgCtor();
         const msgType = Reflect.getMetadata('MessageType', msg);
-
+        
         if (!msgType) throw new Error(`Unable to resolve message type of message:${msgCtor.name}. Use one of the message decorators to set the message type fof the message.`);
 
-        //console.log(`MessageType: ${msgType.toString()}`);
+        const msgPurpose = Reflect.getMetadata('MessagePurpose', msg);
+        if (msgPurpose !== 'event') throw new Error(`Unable to route ${msgPurpose} to topics. Only events can be routed to topics.`);
+
         this.routes[msgType] = topic;
     }
+
+    routeToEndpoint = <T>(msgCtor: new (...args: any[]) => T, queue: string) => {
+        if (!msgCtor) throw new Error(`Argumen 'msgCtor' cannot be null.`);
+        if (!queue) throw new Error(`Argument 'queue' cannot be null.`);
+
+        const msg = new msgCtor();
+        const msgType = Reflect.getMetadata('MessageType', msg);
+
+        if (!msgType) throw new Error(`Unable to resolve message type of message:${msgCtor.name}. Use one of the message decorators to set the message type fof the message.`);
+        
+        const msgPurpose = Reflect.getMetadata('MessagePurpose', msg);
+        if (msgPurpose !== 'command') throw new Error(`Unable to route ${msgPurpose} to topics. Only commands can be routed to queues.`);
+
+        this.routes[msgType] = queue;
+    }
     
-    getDestination<T>(msg: T): { msgType: string, topic: string } {
+    getDestination = <T>(msg: T): { msgType: string, topic: string } => {
         const msgType = Reflect.getMetadata('MessageType', msg);
         if (!(msgType in this.routes)) throw Error(`Route for message:${msgType.toString()} not found.`);
         return {

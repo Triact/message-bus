@@ -2,11 +2,13 @@ declare namespace interfaces {
     type MessageType = (string | symbol);
 
     interface IBus {
-        publish<T>(ctor: new (...args: any[]) => T, populateMessage: (m:T) => void) : void;
+        publish<T>(ctor: new (...args: any[]) => T, populateMessageCallback: (m:T) => void) : void;
+        send<T>(ctor: new (...args: any[]) => T, populateMessageCallback: (m: T) => void) : void;
     }
 
     export interface ITransport {
         publish<T>(msg: T, msgType: string, topic: string) : void;
+        send<T>(msg: T, msgType: string, topic: string) : void;
     }
 
     interface IRouting {
