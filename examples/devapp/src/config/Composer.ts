@@ -1,8 +1,8 @@
 import { Container } from "inversify";
 import { TYPES } from "./types";
 import { interfaces, Endpoint, AmazonTransport, FakeTransport } from 'message-bus.core';
-import EventCreated from '../Messages/EventCreated';
-import CreateEvent from '../Messages/CreateEvent';
+import EventCreated from '../MessagesEventCreated';
+import CreateEvent from '../MessagesCreateEvent';
 import EventCreator from '../handlers/EventCreator';
 import * as AWS from 'aws-sdk';
 

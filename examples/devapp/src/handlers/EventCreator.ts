@@ -1,5 +1,5 @@
 import { interfaces } from 'message-bus.core';
-import CreateEvent from '../Messages/CreateEvent';
+import CreateEvent from '../messages/CreateEvent';
 
 
 export default class EventCreator implements interfaces.IHandleMessages<CreateEvent>{
