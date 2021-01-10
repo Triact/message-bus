@@ -7,9 +7,9 @@ import { MessageHelper } from "./helpers/MessageHelper";
 export default class Bus implements interfaces.IBus {
 
     private transport: interfaces.ITransport;
-    private routing: interfaces.IRouting;
+    private routing: interfaces.IRoutingConfiguration;
 
-    constructor(transport: interfaces.ITransport, routing: interfaces.IRouting) {
+    constructor(transport: interfaces.ITransport, routing: interfaces.IRoutingConfiguration) {
         if (!transport) throw new Error(`Argumet 'transport' cannot be null`);
         if (!routing) throw new Error(`Argument 'routing' cannot be null.`);
 

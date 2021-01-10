@@ -8,5 +8,5 @@ export class MessageHelper {
     static isEvent = <T>(msg: T) : boolean => MessageHelper.isOfPurpose<T>(msg, interfaces.MessagePurposes.EVENT);
 
     static getMessagePurpose = <T>(msg:T) : string => Reflect.getMetadata(interfaces.MessageMetadataKeys.MessagePurpose, msg);
-    static getMessageType = <T>(msg:T) : string => Reflect.getMetadata(interfaces.MessageMetadataKeys.MessageType, msg);
+    static getMessageType = <T>(msg:T) : symbol => Reflect.getMetadata(interfaces.MessageMetadataKeys.MessageType, msg);
 }

@@ -7,7 +7,8 @@ import * as AWS from 'aws-sdk';
 export default class Endpoint {
 
     private routing = new RoutingConfiguration();    
-    private transport: interfaces.ITransport;
+    private handling = new HandlingConfiguration();
+    private transport: interfaces.ITransport;    
 
     constructor() {
         //console.log('###', (AWS.config.credentials as any).profile);
@@ -23,11 +24,13 @@ export default class Endpoint {
         callback(this.routing);
     }
 
-    handlers = (callback: (handling: HandlingConfiguration) => void) => {
-        
+    handlers = (callback: (handling: interfaces.IHandlingConfiguration) => void) => {
+        if (!callback) throw new Error(`Argument 'callback' cannot be null.`);
+        callback(this.handling);
     }
 
     sendOnly = () : interfaces.IBus => {
+        if (this.handling.areRegistered()) throw new Error('Registering handlers is not supported when running in SendOnly mode.');
         return new Bus(this.transport, this.routing);
     }
 }

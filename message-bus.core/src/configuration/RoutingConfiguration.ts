@@ -1,7 +1,7 @@
 import * as interfaces from '../interfaces';
 
-export default class RoutingConfiguration implements interfaces.IRouting {
-    routes: any = {};
+export default class RoutingConfiguration implements interfaces.IRoutingConfiguration {
+    private routes: any = {};
 
     routeToTopic = <T>(msgCtor: new (...args: any[]) => T, topic: string) => {
         if (!msgCtor) throw new Error(`Argumen 'msgCtor' cannot be null.`);
