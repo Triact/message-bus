@@ -1,11 +1,11 @@
 import Bus  from './Bus';
-import { Routing } from './Routing';
+import { RoutingConfiguration } from './Routing';
 import * as interfaces from './interfaces';
 import * as AWS from 'aws-sdk';
 
 export default class Endpoint {
 
-    private routing = new Routing();    
+    private routing = new RoutingConfiguration();    
     private transport: interfaces.ITransport;
 
     constructor() {
@@ -17,10 +17,14 @@ export default class Endpoint {
         this.transport = transport;
     }
 
-    routes = (callback: (routing: Routing) => void) => {
+    routes = (callback: (routing: RoutingConfiguration) => void) => {
         if (!callback) throw Error(`Argument 'callback' cannot be null.`);
         callback(this.routing);
-    } 
+    }
+
+    handlers = (callback: (handling: HandlingConfiguration) => void) => {
+
+    }
 
     sendOnly = () : interfaces.IBus => {
         return new Bus(this.transport, this.routing);
