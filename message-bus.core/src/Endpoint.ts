@@ -1,5 +1,6 @@
 import Bus  from './Bus';
-import { RoutingConfiguration } from './Routing';
+import RoutingConfiguration from './Configuration/RoutingConfiguration';
+import HandlingConfiguration from './Configuration/HandlingConfiguration';
 import * as interfaces from './interfaces';
 import * as AWS from 'aws-sdk';
 
@@ -23,7 +24,7 @@ export default class Endpoint {
     }
 
     handlers = (callback: (handling: HandlingConfiguration) => void) => {
-
+        
     }
 
     sendOnly = () : interfaces.IBus => {

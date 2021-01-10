@@ -1,6 +1,6 @@
-import * as interfaces from './interfaces';
+import * as interfaces from '../interfaces';
 
-export class RoutingConfiguration implements interfaces.IRouting {
+export default class RoutingConfiguration implements interfaces.IRouting {
     routes: any = {};
 
     routeToTopic = <T>(msgCtor: new (...args: any[]) => T, topic: string) => {
