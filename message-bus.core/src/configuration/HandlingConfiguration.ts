@@ -4,7 +4,6 @@ import * as interfaces from '../interfaces';
 export default class HandlingConfiguration implements interfaces.IHandlingConfiguration {
     private handlers: any = {};
 
-
     handleMessages = <T>(msgCtor: new(...args: any[]) => T, handler: interfaces.IHandleMessages<T>) => {
         if (!msgCtor) throw new Error(`Argument 'msgCtor' cannot be null.`);
         if (!handler) throw new Error(`Argument 'handler' cannot be null.`);
