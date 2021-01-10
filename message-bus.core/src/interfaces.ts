@@ -1,7 +1,7 @@
-declare namespace interfaces {
-    type MessageType = (string | symbol);
+//declare namespace interfaces {
+    export type MessageType = (string | symbol);
 
-    interface IBus {
+    export interface IBus {
         publish<T>(ctor: new (...args: any[]) => T, populateMessageCallback: (m:T) => void) : void;
         send<T>(ctor: new (...args: any[]) => T, populateMessageCallback: (m: T) => void) : void;
     }
@@ -11,16 +11,24 @@ declare namespace interfaces {
         send<T>(msg: T, msgType: string, topic: string) : void;
     }
 
-    interface IRouting {
-        //routeToTopic<T>(messageType: interfaces.MessageType, topic: string): void;
+    export interface IRouting {
         routeToTopic<T>(ctor: new (...args: any[]) => T, topic: string): void;
         getDestination<T>(msg: T): { msgType: string, topic: string };
     }
 
-    // const MEssagePurposes = {
-    //     EVENT: 'event'
-    // };
-}
+    export interface IHandleMessages<T> {
+        handle<T>(msg: T) : void;
+    }
 
-export { interfaces };
-//export type MessageIdentifier = (string | symbol);
+    export class MessagePurposes {
+        static readonly EVENT: string = 'event';
+        static readonly COMMAND: string = 'command';
+    }
+
+    export class MessageMetadataKeys {
+        static readonly MessagePurpose: string = 'MessagePurpose';
+        static readonly MessageType: string = 'MessageType';
+    }
+//}
+
+//export { interfaces };

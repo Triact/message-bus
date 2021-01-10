@@ -1,4 +1,4 @@
-import { interfaces } from "../interfaces";
+import * as interfaces from "../interfaces";
 
 export class FakeTransport implements interfaces.ITransport {
     

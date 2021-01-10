@@ -1,5 +1,5 @@
 export { default as Endpoint } from './Endpoint';
-export { interfaces } from './interfaces';
+export * as interfaces from './interfaces';
 
 // Message decorators
 export { event, command } from './decorators/messageDecorators';

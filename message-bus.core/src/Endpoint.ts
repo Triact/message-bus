@@ -1,6 +1,6 @@
 import Bus  from './Bus';
 import { Routing } from './Routing';
-import { interfaces } from './interfaces';
+import * as interfaces from './interfaces';
 import * as AWS from 'aws-sdk';
 
 export default class Endpoint {

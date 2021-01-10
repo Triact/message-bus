@@ -1,6 +1,7 @@
 import "reflect-metadata";
 import { injectable } from "inversify";
-import { interfaces } from './interfaces';
+import * as interfaces from './interfaces';
+import { MessageHelper } from "./Helpers/MessageHelper";
 
 @injectable()
 export default class Bus implements interfaces.IBus {
@@ -21,8 +22,8 @@ export default class Bus implements interfaces.IBus {
         if (!populateMessageCallback) throw new Error(`Argument 'populateMessageCallback' cannot be null`);
         
         const msg = new msgCtor();
-        let msgPurpose = this.getMessagePurpose<T>(msg);
-        if (msgPurpose !== 'event') throw new Error(`Message of purpose:${msgPurpose} cannot be published. Only events can be published.`)
+        if (!MessageHelper.isOfPurpose<T>(msg, interfaces.MessagePurposes.EVENT)) 
+            throw new Error(`Only events can be published.`);
 
         populateMessageCallback(msg);
 
@@ -36,17 +37,13 @@ export default class Bus implements interfaces.IBus {
         if (!populateMessageCallback) throw new Error(`Argument 'populateMessageCallback' cannot be null`);
         
         const msg = new msgCtor();
-        let msgPurpose = this.getMessagePurpose<T>(msg);
-        if (msgPurpose !== 'command') throw new Error(`Message of purpose:${msgPurpose} cannot be published. Only events can be published.`)
+        if (!MessageHelper.isOfPurpose<T>(msg, interfaces.MessagePurposes.COMMAND))
+            throw new Error(`Only command can be send.`)
 
         populateMessageCallback(msg);
 
         const dest = this.routing.getDestination<T>(msg);
 
         this.transport.send(msg, dest.msgType.toString(), dest.topic);
-    }
-
-    private getMessagePurpose = <T>(msg:T) : string => {
-        return Reflect.getMetadata('MessagePurpose', msg);
     }
 }

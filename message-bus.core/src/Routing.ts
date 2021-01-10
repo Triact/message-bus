@@ -1,4 +1,4 @@
-import { interfaces } from './interfaces';
+import * as interfaces from './interfaces';
 
 export class Routing implements interfaces.IRouting {
     routes: any = {};
@@ -13,7 +13,7 @@ export class Routing implements interfaces.IRouting {
         if (!msgType) throw new Error(`Unable to resolve message type of message:${msgCtor.name}. Use one of the message decorators to set the message type fof the message.`);
 
         const msgPurpose = Reflect.getMetadata('MessagePurpose', msg);
-        if (msgPurpose !== 'event') throw new Error(`Unable to route ${msgPurpose} to topics. Only events can be routed to topics.`);
+        if (msgPurpose !== interfaces.MessagePurposes.EVENT) throw new Error(`Unable to route ${msgPurpose} to topics. Only events can be routed to topics.`);
 
         this.routes[msgType] = topic;
     }
@@ -28,7 +28,7 @@ export class Routing implements interfaces.IRouting {
         if (!msgType) throw new Error(`Unable to resolve message type of message:${msgCtor.name}. Use one of the message decorators to set the message type fof the message.`);
         
         const msgPurpose = Reflect.getMetadata('MessagePurpose', msg);
-        if (msgPurpose !== 'command') throw new Error(`Unable to route ${msgPurpose} to topics. Only commands can be routed to queues.`);
+        if (msgPurpose !== interfaces.MessagePurposes.COMMAND) throw new Error(`Unable to route ${msgPurpose} to topics. Only commands can be routed to queues.`);
 
         this.routes[msgType] = queue;
     }

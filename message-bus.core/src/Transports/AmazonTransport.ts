@@ -1,4 +1,4 @@
-import { interfaces } from "../interfaces";
+import * as interfaces from "../interfaces";
 import * as AWS from 'aws-sdk';
 
 export class AmazonTransport implements interfaces.ITransport {

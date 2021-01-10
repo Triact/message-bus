@@ -1,9 +1,9 @@
-import { interfaces } from '../interfaces';
+import * as interfaces from '../interfaces';
 
 export function event(messageType: interfaces.MessageType) {
     
     return function(constructorFunction: Function) {
-        Reflect.defineMetadata('MessagePurpose', 'event', constructorFunction.prototype);
+        Reflect.defineMetadata('MessagePurpose', interfaces.MessagePurposes.EVENT, constructorFunction.prototype);
         Reflect.defineMetadata('MessageType', messageType, constructorFunction.prototype);
     }
 };
@@ -11,7 +11,7 @@ export function event(messageType: interfaces.MessageType) {
 export function command(messageType: interfaces.MessageType) {
     
     return function(constructorFunction: Function) {
-        Reflect.defineMetadata('MessagePurpose', 'command', constructorFunction.prototype);
+        Reflect.defineMetadata('MessagePurpose', interfaces.MessagePurposes.COMMAND, constructorFunction.prototype);
         Reflect.defineMetadata('MessageType', messageType, constructorFunction.prototype);
     }
 }
