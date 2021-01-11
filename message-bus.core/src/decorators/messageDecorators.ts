@@ -1,15 +1,17 @@
-import { interfaces } from '../interfaces';
+import * as interfaces from '../interfaces';
 
-export function _event(messageType: interfaces.MessageType) {
-    console.log('DECORATOR: Factory invoked')
-
+export function event(messageType: interfaces.MessageType) {
     
     return function(constructorFunction: Function) {
-        console.log("DECORATOR: decorating");        
-        Reflect.defineMetadata('MessagePurpose', 'event', constructorFunction.prototype);
+        Reflect.defineMetadata('MessagePurpose', interfaces.MessagePurposes.EVENT, constructorFunction.prototype);
         Reflect.defineMetadata('MessageType', messageType, constructorFunction.prototype);
-
-        const data = Reflect.getMetadata('MessageType', constructorFunction.prototype);
-        console.log(`data: ${data.toString()}`);
     }
 };
+
+export function command(messageType: interfaces.MessageType) {
+    
+    return function(constructorFunction: Function) {
+        Reflect.defineMetadata('MessagePurpose', interfaces.MessagePurposes.COMMAND, constructorFunction.prototype);
+        Reflect.defineMetadata('MessageType', messageType, constructorFunction.prototype);
+    }
+}

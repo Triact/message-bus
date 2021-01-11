@@ -1,19 +1,16 @@
-import * as customEnv from 'custom-env';
-import { Container } from 'inversify';
 import { interfaces } from 'message-bus.core';
-import { Composer } from './Config/Composer';
-import { TYPES } from "./Config/Types";
-import EventCreatedConsumer from './Consumers/EventCreatedConsumer';
-import EventCreated from './Messages/EventCreated';
+import EventCreated from './messages/EventCreated';
+import CreateEvent from './messages/CreateEvent';
+import { TYPES } from "./config/Types";
+import { Container } from 'inversify';
+import { Composer } from './config/Composer';
+import * as AWS from 'aws-sdk';
+import * as customEnv from 'custom-env';
 
 
 console.log("Starting...");
 
 customEnv.env(true);
-
-console.log("### Process:", process.env.AWS_PROFILE)
-
-
 
 //AWS.config.credentials = awsCredentials;
 //AWS.config.update({region: 'eu-west-1'});
@@ -26,8 +23,11 @@ composer.compose();
 
 const bus = container.get<interfaces.IBus>(TYPES.IBus);
 
-var consumer = new EventCreatedConsumer();
+// bus.publish<EventCreated>(EventCreated, (m: EventCreated) => { 
+//     m.eventId = 'blabla'; 
+// });
 
-bus.publish<EventCreated>(EventCreated, (m: EventCreated) => {
-    m.eventId = 'blabla';
-});
+bus.send<CreateEvent>(CreateEvent, (m: CreateEvent) => {
+    m.eventId = '1';
+    m.name = 'Test event';
+})

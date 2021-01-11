@@ -1,44 +1,35 @@
-declare namespace interfaces {
-    type MessageType = (string | symbol);
+export type MessageType = (string | symbol);
 
-    interface IBus {
-        publish<T>(ctor: new (...args: any[]) => T, populateMessage: (m: T) => void): void;
-    }
-
-    export interface ITransport {
-        publish<T>(msg: T, msgType: string, topic: string): void;
-        createConsumers(): void;
-    }
-
-    interface IRouting {
-        //routeToTopic<T>(messageType: interfaces.MessageType, topic: string): void;
-        routeToTopic<T>(ctor: new (...args: any[]) => T, topic: string): void;
-        getDestination<T>(msg: T): { msgType: string, topic: string };
-    }
-
-    export interface IConsumerBase {
-
-    }
-
-    export interface IConsumer<TMessage> extends IConsumerBase {
-        handle(msg: TMessage): Promise<void>;
-    }
+export interface IBus {
+    publish<T>(ctor: new (...args: any[]) => T, populateMessageCallback: (m:T) => void) : void;
+    send<T>(ctor: new (...args: any[]) => T, populateMessageCallback: (m: T) => void) : void;
 }
 
-const implementations: any[] = [];
-
-function GetImplementations(): any[] {
-    return implementations;
+export interface ITransport {
+    publish<T>(msg: T, msgType: string, topic: string) : void;
+    send<T>(msg: T, msgType: string, topic: string) : void;
+    createConsumers(): void;
 }
 
-function register(msg: string) {
-
-    return function (constructorFunction: Function) {
-        console.log('### register', constructorFunction);
-        implementations.push(constructorFunction);
-        //return ctor;
-    }
+export interface IRoutingConfiguration {
+    routeToTopic<T>(ctor: new (...args: any[]) => T, topic: string): void;
+    getDestination<T>(msg: T): { msgType: string, topic: string };
 }
 
-export { interfaces, register, GetImplementations };
-//export type MessageIdentifier = (string | symbol);
+export interface IHandlingConfiguration {
+    handleMessages<T>(msgCtor: new(...args: any[]) => T, handler: IHandleMessages<T>) : void;
+}
+
+export interface IHandleMessages<T> {
+    handle(msg: T) : void;
+}
+
+export class MessagePurposes {
+    static readonly EVENT: string = 'event';
+    static readonly COMMAND: string = 'command';
+}
+
+export class MessageMetadataKeys {
+    static readonly MessagePurpose: string = 'MessagePurpose';
+    static readonly MessageType: string = 'MessageType';
+}
