@@ -9,7 +9,7 @@
     "clean": "IF exist lib (rmdir /q /s lib) && mkdir lib",
     "dev": "tsc -w",
     "build": "tsc",
-    "prepublish": "npm run clean",
+    "prepublish": "npm run clean && npm run build",
     "refreshVSToken": "vsts-npm-auth -C .npmrc -T .npmrc"
   },
   "license": "ISC",

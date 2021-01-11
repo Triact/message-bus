@@ -1,5 +1,5 @@
 import * as AWS from 'aws-sdk';
-import { AWSError, SNS, SQS } from 'aws-sdk';
+import { SQS } from 'aws-sdk';
 import * as interfaces from "../interfaces";
 export class AmazonTransport implements interfaces.ITransport {
     
@@ -9,6 +9,10 @@ export class AmazonTransport implements interfaces.ITransport {
     constructor(awsConfig: AWS.Config) {
         this.sns = new AWS.SNS(awsConfig);
         this.sqs = new AWS.SQS(awsConfig);
+    }
+    
+    createConsumers(): void {
+        throw new Error('Method not implemented.');
     }
 
     publish = <T>(msg: T, msgType: string, topic: string) => {
