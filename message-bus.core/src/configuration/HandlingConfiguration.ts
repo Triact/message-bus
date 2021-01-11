@@ -11,8 +11,10 @@ export default class HandlingConfiguration implements interfaces.IHandlingConfig
         let msg = new msgCtor();
         let msgType = MessageHelper.getMessageType(msg);
         
-        if (this.handlers[msgType] && this.handlers[msgType].includes(handler)) 
-            throw new Error(`Handler already registered for message:${msgType.toString()}`);
+        // console.log('### handler', this.handlers[msgType]);
+        // console.log('### includes', this.handlers[msgType] && this.handlers[msgType].includes(handler));
+        // if (this.handlers[msgType] && this.handlers[msgType].includes(handler)) 
+        //     throw new Error(`Handler already registered for message:${msgType.toString()}`);
         
         if (!this.handlers[msgType])
             this.handlers[msgType] = [];

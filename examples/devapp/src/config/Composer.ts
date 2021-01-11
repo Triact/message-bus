@@ -35,6 +35,7 @@ export class Composer {
         endpoint.handlers(handling => {
             handling.handleMessages<CreateEvent>(CreateEvent, new EventCreator())
             handling.handleMessages<BakeCake>(BakeCake, new Bakery());
+            handling.handleMessages<BakeCake>(BakeCake, new Bakery());
         });
         const bus = endpoint.sendOnly();
 
