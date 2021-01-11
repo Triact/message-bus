@@ -1,6 +1,6 @@
-import * as interfaces from "../interfaces";
 import * as AWS from 'aws-sdk';
-
+import { AWSError, SNS, SQS } from 'aws-sdk';
+import * as interfaces from "../interfaces";
 export class AmazonTransport implements interfaces.ITransport {
     
     private sns: AWS.SNS;

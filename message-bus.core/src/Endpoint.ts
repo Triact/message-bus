@@ -1,11 +1,7 @@
-import Bus  from './Bus';
-import RoutingConfiguration from './Configuration/RoutingConfiguration';
-import HandlingConfiguration from './Configuration/HandlingConfiguration';
-import * as interfaces from './interfaces';
-import * as AWS from 'aws-sdk';
 import Bus from './Bus';
-import { GetImplementations, interfaces } from './interfaces';
-import { Routing } from './Routing';
+import HandlingConfiguration from './Configuration/HandlingConfiguration';
+import RoutingConfiguration from './Configuration/RoutingConfiguration';
+import * as interfaces from './interfaces';
 
 interface StartOptions {
     sendOnly?: boolean;
@@ -13,9 +9,9 @@ interface StartOptions {
 
 export default class Endpoint {
 
-    private routing = new RoutingConfiguration();    
+    private routing = new RoutingConfiguration();
     private handling = new HandlingConfiguration();
-    private transport: interfaces.ITransport;    
+    private transport: interfaces.ITransport;
 
     constructor() {
         //console.log('###', (AWS.config.credentials as any).profile);
@@ -34,7 +30,7 @@ export default class Endpoint {
     start = (options: StartOptions = {}): interfaces.IBus => {
         var bus = new Bus(this.transport, this.routing);
 
-        console.log('### implementations: ', GetImplementations());
+        //console.log('### implementations: ', GetImplementations());
 
         if (!options.sendOnly) {
             bus.listen();
@@ -48,7 +44,7 @@ export default class Endpoint {
         callback(this.handling);
     }
 
-    sendOnly = () : interfaces.IBus => {
+    sendOnly = (): interfaces.IBus => {
         if (this.handling.areRegistered()) throw new Error('Registering handlers is not supported when running in SendOnly mode.');
         return new Bus(this.transport, this.routing);
     }

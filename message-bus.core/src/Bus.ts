@@ -1,6 +1,6 @@
 import { injectable } from "inversify";
-import * as interfaces from './interfaces';
 import { MessageHelper } from "./helpers/MessageHelper";
+import * as interfaces from './interfaces';
 
 @injectable()
 export default class Bus implements interfaces.IBus {
