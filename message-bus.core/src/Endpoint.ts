@@ -1,10 +1,7 @@
-<<<<<<< HEAD
-=======
 import Bus  from './Bus';
 import RoutingConfiguration from './Configuration/RoutingConfiguration';
 import HandlingConfiguration from './Configuration/HandlingConfiguration';
 import * as interfaces from './interfaces';
->>>>>>> main
 import * as AWS from 'aws-sdk';
 import Bus from './Bus';
 import { GetImplementations, interfaces } from './interfaces';

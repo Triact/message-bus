@@ -1,11 +1,6 @@
 import { injectable } from "inversify";
-<<<<<<< HEAD
-import "reflect-metadata";
-import { interfaces } from './interfaces';
-=======
 import * as interfaces from './interfaces';
 import { MessageHelper } from "./helpers/MessageHelper";
->>>>>>> main
 
 @injectable()
 export default class Bus implements interfaces.IBus {
