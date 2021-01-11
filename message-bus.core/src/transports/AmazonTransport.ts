@@ -19,13 +19,11 @@ export class AmazonTransport implements interfaces.ITransport {
         console.log("### creating consumers")
         routes.forEach((r) => {
             console.log(r);
-            console.log('handler', handlerProvider.getHandler(r.msgType));
-            console.log('handle', handlerProvider.getHandler(r.msgType).handle);
-            
+
             let consumer = new AmazonConsumer({
                 sqs: this.sqs,
                 queueUrl: r.topic,
-                handler: handlerProvider.getHandler(r.msgType)
+                handler: handlerProvider.getHandler(r.msgCtor, r.msgType)
             });
 
             consumer.start();
@@ -78,7 +76,7 @@ class AmazonConsumer<T> {
     }
 
     public start = async () => {
-        console.log("### starting consumer")
+        //console.log("### starting consumer", this.options)
         this.poll();
     }
 
@@ -88,10 +86,12 @@ class AmazonConsumer<T> {
                 .receiveMessage({ QueueUrl: this.options.queueUrl })
                 .promise()
                 .then(this.handleResponse);
-        } catch (err) {
-            console.error(err);
-        } finally {
+
             setTimeout(this.poll, 1000);
+        } catch (err) {
+            console.error('pollerr', err);
+        } finally {
+            //setTimeout(this.poll, 1000);
         }
     }
 
@@ -113,7 +113,7 @@ class AmazonConsumer<T> {
             await this.deleteMessage(message);
         }
         catch (err) {
-            console.error(err);
+            console.error('processMessage', err);
         }
     }
 
@@ -129,7 +129,7 @@ class AmazonConsumer<T> {
                 .deleteMessage(deleteParams)
                 .promise();
         } catch (err) {
-            console.error(err);
+            console.error('deleteMessage', err);
         }
     }
 

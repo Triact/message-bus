@@ -21,8 +21,11 @@ export default class HandlingConfiguration implements interfaces.IHandlingConfig
         this.handlers[msgType].push(handler);
     }
 
-    getHandler(msgType: symbol): any  {
-        return this.handlers[msgType];
+    getHandler<T>(msgCtor: new (...args: any[]) => T, msgType: symbol): interfaces.IHandleMessages<T> {
+        console.log('handlers', this.handlers);
+        console.log(this.handlers[msgType]);
+        console.log(msgCtor, new msgCtor());
+        return this.handlers[msgType] as interfaces.IHandleMessages<T>;
     }
 
 

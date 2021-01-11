@@ -1,9 +1,7 @@
 import * as AWS from 'aws-sdk';
 import { Container } from "inversify";
 import { AmazonTransport, Endpoint, interfaces } from 'message-bus.core';
-import Bakery from '../handlers/Bakery';
 import EventCreator from '../handlers/EventCreator';
-import BakeCake from '../messages/BakeCake';
 import CreateEvent from '../messages/CreateEvent';
 import { TYPES } from "./types";
 
@@ -34,7 +32,7 @@ export class Composer {
         });
         endpoint.handlers(handling => {
             handling.handleMessages<CreateEvent>(CreateEvent, new EventCreator())
-            handling.handleMessages<BakeCake>(BakeCake, new Bakery());
+            //handling.handleMessages<BakeCake>(BakeCake, new Bakery());
         });
 
         console.log("dikke pik");
