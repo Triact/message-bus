@@ -1,27 +1,36 @@
 export type MessageType = (string | symbol);
+export type RouteDefinition = { msg: string, topic: string };
 
 export interface IBus {
-    publish<T>(ctor: new (...args: any[]) => T, populateMessageCallback: (m:T) => void) : void;
-    send<T>(ctor: new (...args: any[]) => T, populateMessageCallback: (m: T) => void) : void;
+    publish<T>(ctor: new (...args: any[]) => T, populateMessageCallback: (m: T) => void): void;
+    send<T>(ctor: new (...args: any[]) => T, populateMessageCallback: (m: T) => void): void;
 }
 
 export interface ITransport {
-    publish<T>(msg: T, msgType: string, topic: string) : void;
-    send<T>(msg: T, msgType: string, topic: string) : void;
-    createConsumers(): void;
+    publish<T>(msg: T, msgType: string, topic: string): void;
+    send<T>(msg: T, msgType: string, topic: string): void;
+    createConsumers(routesProvides: IProvideRoutes, handlerProvider: IProvideMessageHandler): void;
 }
 
-export interface IRoutingConfiguration {
+export interface IRoutingConfiguration extends IProvideRoutes {
     routeToTopic<T>(ctor: new (...args: any[]) => T, topic: string): void;
     getDestination<T>(msg: T): { msgType: string, topic: string };
 }
 
-export interface IHandlingConfiguration {
-    handleMessages<T>(msgCtor: new(...args: any[]) => T, handler: IHandleMessages<T>) : void;
+export interface IProvideRoutes {
+    getRoutes(): RouteDefinition[];
+}
+
+export interface IHandlingConfiguration extends IProvideMessageHandler {
+    handleMessages<T>(msgCtor: new (...args: any[]) => T, handler: IHandleMessages<T>): void;
+}
+
+export interface IProvideMessageHandler {
+    getHandler(msgType: string): IHandleMessages<any>;
 }
 
 export interface IHandleMessages<T> {
-    handle(msg: T) : void;
+    handle(msg: T): Promise<void>;
 }
 
 export class MessagePurposes {

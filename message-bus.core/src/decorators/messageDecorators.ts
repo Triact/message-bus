@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import * as interfaces from '../interfaces';
 
 export function event(messageType: interfaces.MessageType) {

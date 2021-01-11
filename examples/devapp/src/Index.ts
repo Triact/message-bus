@@ -1,11 +1,9 @@
-import { interfaces } from 'message-bus.core';
-import EventCreated from './messages/EventCreated';
-import CreateEvent from './messages/CreateEvent';
-import { TYPES } from "./config/Types";
-import { Container } from 'inversify';
-import { Composer } from './config/Composer';
-import * as AWS from 'aws-sdk';
 import * as customEnv from 'custom-env';
+import { Container } from 'inversify';
+import { interfaces } from 'message-bus.core';
+import { Composer } from './config/Composer';
+import { TYPES } from "./config/Types";
+import CreateEvent from './messages/CreateEvent';
 
 
 console.log("Starting...");

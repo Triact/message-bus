@@ -1,13 +1,12 @@
 import * as AWS from 'aws-sdk';
 import { Container } from "inversify";
-import { TYPES } from "./types";
-import { interfaces, Endpoint, AmazonTransport, FakeTransport } from 'message-bus.core';
-import EventCreated from '../messages/EventCreated';
-import CreateEvent from '../messages/CreateEvent';
-import BakeCake from '../messages/BakeCake';
-import EventCreator from '../handlers/EventCreator';
+import { Endpoint, FakeTransport, interfaces } from 'message-bus.core';
 import Bakery from '../handlers/Bakery';
-import * as AWS from 'aws-sdk';
+import EventCreator from '../handlers/EventCreator';
+import BakeCake from '../messages/BakeCake';
+import CreateEvent from '../messages/CreateEvent';
+import EventCreated from '../messages/EventCreated';
+import { TYPES } from "./types";
 
 export class Composer {
 

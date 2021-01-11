@@ -1,18 +1,32 @@
 import * as AWS from 'aws-sdk';
 import { SQS } from 'aws-sdk';
 import * as interfaces from "../interfaces";
+
 export class AmazonTransport implements interfaces.ITransport {
-    
+
     private sns: AWS.SNS;
     private sqs: AWS.SQS;
+    private consumers: AmazonConsumer[] = [];
 
     constructor(awsConfig: AWS.Config) {
         this.sns = new AWS.SNS(awsConfig);
         this.sqs = new AWS.SQS(awsConfig);
     }
-    
-    createConsumers(): void {
-        throw new Error('Method not implemented.');
+
+    createConsumers(routesProvides: interfaces.IProvideRoutes, handlerProvider: interfaces.IProvideMessageHandler): void {
+        routesProvides.getRoutes().forEach((r) => {
+            let handler = handlerProvider.getHandler(r.msg);
+
+            let consumer = new AmazonConsumer({
+                sqs: this.sqs,
+                queueUrl: r.topic,
+                handleMessage: handler.handle
+            });
+
+            consumer.start();
+            
+            this.consumers.push(consumer);
+        });
     }
 
     publish = <T>(msg: T, msgType: string, topic: string) => {
@@ -20,7 +34,7 @@ export class AmazonTransport implements interfaces.ITransport {
             Message: JSON.stringify(msg),
             TopicArn: topic,
             MessageAttributes: {
-                'MessageBus.MessageType': { DataType: 'String', StringValue: msgType}
+                'MessageBus.MessageType': { DataType: 'String', StringValue: msgType }
             }
         }, (error: AWS.AWSError, data: AWS.SNS.PublishResponse) => {
             if (error) console.error("Error publishing message.", error);
@@ -31,8 +45,8 @@ export class AmazonTransport implements interfaces.ITransport {
         let params = {
             DelaySeconds: 0,
             MessageAttributes: {
-                "MessageBus.MessageType" : {
-                    DataType:"String",
+                "MessageBus.MessageType": {
+                    DataType: "String",
                     StringValue: msgType
                 }
             },
