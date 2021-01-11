@@ -2,15 +2,23 @@ import * as AWS from 'aws-sdk';
 import { SQS } from 'aws-sdk';
 import * as interfaces from "../interfaces";
 
+interface AmazonTransportOptions {
+    awsConfig: AWS.Config;
+    useLambda: boolean | undefined;
+}
+
 export class AmazonTransport implements interfaces.ITransport {
 
     private sns: AWS.SNS;
     private sqs: AWS.SQS;
     private consumers: AmazonConsumer[] = [];
 
-    constructor(awsConfig: AWS.Config) {
-        this.sns = new AWS.SNS(awsConfig);
-        this.sqs = new AWS.SQS(awsConfig);
+    constructor(options: AmazonTransportOptions) {
+        if (!options) throw Error(`Argument 'options' cannot be null.`);
+        if (!options.awsConfig) throw new Error(`Argument 'options.awsConfig' cannot be null.`);
+
+        this.sns = new AWS.SNS(options.awsConfig);
+        this.sqs = new AWS.SQS(options.awsConfig);
     }
 
     createConsumers(routesProvides: interfaces.IProvideRoutes, handlerProvider: interfaces.IProvideMessageHandler): void {

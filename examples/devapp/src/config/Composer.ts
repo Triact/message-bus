@@ -1,6 +1,6 @@
 import * as AWS from 'aws-sdk';
 import { Container } from "inversify";
-import { Endpoint, FakeTransport, interfaces } from 'message-bus.core';
+import { Endpoint, FakeTransport, AmazonTransport, interfaces } from 'message-bus.core';
 import Bakery from '../handlers/Bakery';
 import EventCreator from '../handlers/EventCreator';
 import BakeCake from '../messages/BakeCake';
@@ -26,8 +26,11 @@ export class Composer {
         });
 
         const endpoint = new Endpoint();
-        //endpoint.useTransport<AmazonTransport>(new AmazonTransport(awsConfig));
-        endpoint.useTransport<FakeTransport>(new FakeTransport());
+        endpoint.useTransport<AmazonTransport>(new AmazonTransport({
+            awsConfig: awsConfig,
+            useLambda: true
+        }));
+        //endpoint.useTransport<FakeTransport>(new FakeTransport());
         endpoint.routes(routing => {
             routing.routeToTopic<EventCreated>(EventCreated, `arn:aws:sns:${awsConfig.region}:${process.env.AWS_ACCOUNT_ID}:tijdprikker_event-created`);
             routing.routeToEndpoint<CreateEvent>(CreateEvent, `https://sqs.${awsConfig.region}.amazonaws.com/${process.env.AWS_ACCOUNT_ID}/tijdprikker_SlackNotifier`);
