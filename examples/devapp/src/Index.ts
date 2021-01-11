@@ -1,10 +1,10 @@
-import { interfaces } from 'message-bus.core';
-import EventCreated from './Messages/EventCreated';
-import { TYPES } from "./Config/Types";
-import { Container } from 'inversify';
-import { Composer } from './Config/Composer';
-import * as AWS from 'aws-sdk';
 import * as customEnv from 'custom-env';
+import { Container } from 'inversify';
+import { interfaces } from 'message-bus.core';
+import { Composer } from './Config/Composer';
+import { TYPES } from "./Config/Types";
+import EventCreatedConsumer from './Consumers/EventCreatedConsumer';
+import EventCreated from './Messages/EventCreated';
 
 
 console.log("Starting...");
@@ -26,6 +26,8 @@ composer.compose();
 
 const bus = container.get<interfaces.IBus>(TYPES.IBus);
 
-bus.publish<EventCreated>(EventCreated, (m: EventCreated) => { 
-    m.eventId = 'blabla'; 
+var consumer = new EventCreatedConsumer();
+
+bus.publish<EventCreated>(EventCreated, (m: EventCreated) => {
+    m.eventId = 'blabla';
 });

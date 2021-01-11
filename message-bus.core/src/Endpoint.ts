@@ -1,11 +1,15 @@
-import Bus  from './Bus';
-import { Routing } from './Routing';
-import { interfaces } from './interfaces';
 import * as AWS from 'aws-sdk';
+import Bus from './Bus';
+import { GetImplementations, interfaces } from './interfaces';
+import { Routing } from './Routing';
+
+interface StartOptions {
+    sendOnly?: boolean;
+}
 
 export default class Endpoint {
 
-    private routing = new Routing();    
+    private routing = new Routing();
     private transport: interfaces.ITransport;
 
     constructor() {
@@ -18,9 +22,17 @@ export default class Endpoint {
 
     routes = (callback: (routing: Routing) => void) => {
         callback(this.routing);
-    } 
+    }
 
-    sendOnly = () : interfaces.IBus => {
-        return new Bus(this.transport, this.routing);
+    start = (options: StartOptions = {}): interfaces.IBus => {
+        var bus = new Bus(this.transport, this.routing);
+
+        console.log('### implementations: ', GetImplementations());
+
+        if (!options.sendOnly) {
+            bus.listen();
+        }
+
+        return bus;
     }
 }

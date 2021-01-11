@@ -1,5 +1,5 @@
-import "reflect-metadata";
 import { injectable } from "inversify";
+import "reflect-metadata";
 import { interfaces } from './interfaces';
 
 @injectable()
@@ -13,7 +13,11 @@ export default class Bus implements interfaces.IBus {
         this.routing = routing;
     }
 
-    publish = <T>(ctor: new (...args: any[]) => T, populateMessage: (m:T) => void) => {
+    listen = () => {
+        this.transport.createConsumers();
+    }
+
+    publish = <T>(ctor: new (...args: any[]) => T, populateMessage: (m: T) => void) => {
         const msg = new ctor();
         populateMessage(msg);
 

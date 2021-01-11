@@ -1,8 +1,8 @@
-import { Container } from "inversify";
-import { TYPES } from "./types";
-import { interfaces, Endpoint, AmazonTransport } from 'message-bus.core';
-import EventCreated from "../Messages/EventCreated";
 import * as AWS from 'aws-sdk';
+import { Container } from "inversify";
+import { AmazonTransport, Endpoint, interfaces } from 'message-bus.core';
+import EventCreated from "../Messages/EventCreated";
+import { TYPES } from "./types";
 
 export class Composer {
 
@@ -14,7 +14,7 @@ export class Composer {
 
     compose = () => {
         // AWS configuration
-        const awsCredentials = new AWS.SharedIniFileCredentials({profile: process.env.AWS_PROFILE});
+        const awsCredentials = new AWS.SharedIniFileCredentials({ profile: process.env.AWS_PROFILE });
         const awsConfig = new AWS.Config();
         awsConfig.update({
             credentials: awsCredentials,
@@ -26,7 +26,7 @@ export class Composer {
         endpoint.routes(routing => {
             routing.routeToTopic<EventCreated>(EventCreated, `arn:aws:sns:${awsConfig.region}:${process.env.AWS_ACCOUNT_ID}:tijdprikker_event-created`);
         });
-        const bus = endpoint.sendOnly();
+        const bus = endpoint.start();
 
         this.container.bind<interfaces.IBus>(TYPES.IBus).toConstantValue(bus);
     }
