@@ -1,5 +1,5 @@
 export type MessageType = (string | symbol);
-export type RouteDefinition = { msg: string, topic: string };
+export type RouteDefinition = { msgType: MessageType, topic: string };
 
 export interface IBus {
     publish<T>(ctor: new (...args: any[]) => T, populateMessageCallback: (m: T) => void): void;
@@ -26,7 +26,7 @@ export interface IHandlingConfiguration extends IProvideMessageHandler {
 }
 
 export interface IProvideMessageHandler {
-    getHandler(msgType: string): IHandleMessages<any>;
+    getHandler(msgType: MessageType): any;
 }
 
 export interface IHandleMessages<T> {

@@ -1,11 +1,10 @@
 import * as AWS from 'aws-sdk';
 import { Container } from "inversify";
-import { Endpoint, FakeTransport, interfaces } from 'message-bus.core';
+import { AmazonTransport, Endpoint, interfaces } from 'message-bus.core';
 import Bakery from '../handlers/Bakery';
 import EventCreator from '../handlers/EventCreator';
 import BakeCake from '../messages/BakeCake';
 import CreateEvent from '../messages/CreateEvent';
-import EventCreated from '../messages/EventCreated';
 import { TYPES } from "./types";
 
 export class Composer {
@@ -27,15 +26,18 @@ export class Composer {
 
         const endpoint = new Endpoint();
         //endpoint.useTransport<AmazonTransport>(new AmazonTransport(awsConfig));
-        endpoint.useTransport<FakeTransport>(new FakeTransport());
+        endpoint.useTransport<AmazonTransport>(new AmazonTransport(awsConfig));
         endpoint.routes(routing => {
-            routing.routeToTopic<EventCreated>(EventCreated, `arn:aws:sns:${awsConfig.region}:${process.env.AWS_ACCOUNT_ID}:tijdprikker_event-created`);
-            routing.routeToEndpoint<CreateEvent>(CreateEvent, `https://sqs.${awsConfig.region}.amazonaws.com/${process.env.AWS_ACCOUNT_ID}/tijdprikker_SlackNotifier`);
+            //routing.routeToTopic<EventCreated>(EventCreated, `arn:aws:sns:${awsConfig.region}:${process.env.AWS_ACCOUNT_ID}:tijdprikker_event-created`);
+            //routing.routeToEndpoint<CreateEvent>(CreateEvent, `https://sqs.${awsConfig.region}.amazonaws.com/${process.env.AWS_ACCOUNT_ID}/tijdprikker_SlackNotifier`);            
+            routing.routeToEndpoint<CreateEvent>(CreateEvent, `https://sqs.${awsConfig.region}.amazonaws.com/${process.env.AWS_ACCOUNT_ID}/simplequeue`);
         });
         endpoint.handlers(handling => {
             handling.handleMessages<CreateEvent>(CreateEvent, new EventCreator())
             handling.handleMessages<BakeCake>(BakeCake, new Bakery());
         });
+
+        console.log("dikke pik");
         const bus = endpoint.start();
 
         this.container.bind<interfaces.IBus>(TYPES.IBus).toConstantValue(bus);

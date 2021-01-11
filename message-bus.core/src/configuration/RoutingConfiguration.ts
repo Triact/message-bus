@@ -1,6 +1,6 @@
 import * as interfaces from '../interfaces';
 
-export default class RoutingConfiguration implements interfaces.IRoutingConfiguration, interfaces.IProvideRoutes {
+export default class RoutingConfiguration implements interfaces.IRoutingConfiguration{
 
     private routes: any = {};
 
@@ -20,8 +20,9 @@ export default class RoutingConfiguration implements interfaces.IRoutingConfigur
     }
 
     getRoutes(): interfaces.RouteDefinition[] {
-        return Object.getOwnPropertyNames(this.routes).map(o => {
-            return { msg: o, topic: this.routes[o] }
+        console.log(this.routes);
+        return Object.getOwnPropertySymbols(this.routes).map(o => {
+            return { msgType: o, topic: this.routes[o] }
         });
     }
 

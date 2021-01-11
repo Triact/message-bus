@@ -1,7 +1,7 @@
 import { MessageHelper } from '../helpers/MessageHelper';
 import * as interfaces from '../interfaces';
 
-export default class HandlingConfiguration implements interfaces.IHandlingConfiguration, interfaces.IProvideMessageHandler {
+export default class HandlingConfiguration implements interfaces.IHandlingConfiguration {
 
     private handlers: any = {};
 
@@ -21,9 +21,8 @@ export default class HandlingConfiguration implements interfaces.IHandlingConfig
         this.handlers[msgType].push(handler);
     }
 
-    getHandler(msgType: string): interfaces.IHandleMessages<any> {
-
-        return this.handlers[msgType] as interfaces.IHandleMessages<any>;
+    getHandler(msgType: symbol): any  {
+        return this.handlers[msgType];
     }
 
 
