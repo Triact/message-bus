@@ -20,7 +20,7 @@ export interface IHandlingConfiguration {
 }
 
 export interface IHandleMessages<T> {
-    handle<T>(msg: T) : void;
+    handle(msg: T) : void;
 }
 
 export class MessagePurposes {

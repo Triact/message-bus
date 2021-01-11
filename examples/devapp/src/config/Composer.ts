@@ -3,7 +3,9 @@ import { TYPES } from "./types";
 import { interfaces, Endpoint, AmazonTransport, FakeTransport } from 'message-bus.core';
 import EventCreated from '../messages/EventCreated';
 import CreateEvent from '../messages/CreateEvent';
+import BakeCake from '../messages/BakeCake';
 import EventCreator from '../handlers/EventCreator';
+import Bakery from '../handlers/Bakery';
 import * as AWS from 'aws-sdk';
 
 export class Composer {
@@ -32,6 +34,7 @@ export class Composer {
         });
         endpoint.handlers(handling => {
             handling.handleMessages<CreateEvent>(CreateEvent, new EventCreator())
+            handling.handleMessages<BakeCake>(BakeCake, new Bakery());
         });
         const bus = endpoint.sendOnly();
 

@@ -21,6 +21,7 @@ export default class HandlingConfiguration implements interfaces.IHandlingConfig
     }
 
     areRegistered = () => {
-        return false;
+        console.log('###', this.handlers);
+        return this.handlers.length > 0;
     }
 }
