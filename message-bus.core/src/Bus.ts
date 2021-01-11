@@ -19,7 +19,7 @@ export default class Bus implements interfaces.IBus {
         this.handling = handling;
     }
 
-    listen = () => {
+    startListening = () => {
         this.transport.createConsumers(this.routing, this.handling);
     }
 
