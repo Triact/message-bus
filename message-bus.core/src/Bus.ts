@@ -1,4 +1,5 @@
-import { injectable } from "inversify";
+import { inject, injectable } from "inversify";
+import { IProvideEndpointConfiguration } from "./configuration/EndpointConfiguration";
 import { MessageHelper } from "./helpers/MessageHelper";
 import * as interfaces from './interfaces';
 
@@ -9,14 +10,16 @@ export default class Bus implements interfaces.IBus {
     private routing: interfaces.IRoutingConfiguration;
     private handling: interfaces.IHandlingConfiguration;
 
-    constructor(transport: interfaces.ITransport, routing: interfaces.IRoutingConfiguration, handling: interfaces.IHandlingConfiguration) {
-        if (!transport) throw new Error(`Argumet 'transport' cannot be null`);
-        if (!routing) throw new Error(`Argument 'routing' cannot be null.`);
-        if (!handling) throw new Error(`Argument 'handling' cannot be null.`);
+    //constructor(transport: interfaces.ITransport, routing: interfaces.IRoutingConfiguration, handling: interfaces.IHandlingConfiguration) {
+    constructor(@inject(interfaces.TYPES.IProvideEnpointConfiguration) endpointConfigurationProvider: IProvideEndpointConfiguration) {    
+        if (!endpointConfigurationProvider) throw new Error(`Argument 'endpointConfigurationProvider' cannot be null.`);
+        //if (!transport) throw new Error(`Argumet 'transport' cannot be null`);
+        //if (!routing) throw new Error(`Argument 'routing' cannot be null.`);
+        //if (!handling) throw new Error(`Argument 'handling' cannot be null.`);
 
-        this.transport = transport;
-        this.routing = routing;
-        this.handling = handling;
+        this.transport = endpointConfigurationProvider.transport;
+        this.routing = endpointConfigurationProvider.routing;
+        this.handling = endpointConfigurationProvider.handling;
     }
 
     startListening = () => {

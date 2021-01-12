@@ -1,7 +1,8 @@
 import { Container } from 'inversify';
 import Bus from './Bus';
-import HandlingConfiguration from './Configuration/HandlingConfiguration';
-import RoutingConfiguration from './Configuration/RoutingConfiguration';
+import EndpointConfiguration, { IProvideEndpointConfiguration } from './configuration/EndpointConfiguration'
+import HandlingConfiguration from './configuration/HandlingConfiguration';
+import RoutingConfiguration from './configuration/RoutingConfiguration';
 import * as interfaces from './interfaces';
 
 interface StartOptions {
@@ -10,36 +11,37 @@ interface StartOptions {
 
 export default class Endpoint {
 
-    private name: string;
-    private container: Container;
-    private routing = new RoutingConfiguration();
-    private handling = new HandlingConfiguration();
-    private transport: interfaces.ITransport;
+    private config = new EndpointConfiguration();
 
     constructor(name: string) {
-        this.name = name;
+        this.config.endpointName = name;
     }
 
     useExistingContainer = (container: Container) => {
         if (!container) throw new Error(`Argument 'container' cannot be null.`);
-        this.container = container;
+        this.config.container = container;
     }
 
     useTransport = <T extends interfaces.ITransport>(transport: T) => {
         if (!transport) throw new Error(`Argument 'transport' cannot be null.`);
-        this.transport = transport;
+        this.config.transport = transport;
     }
 
     routes = (callback: (routing: RoutingConfiguration) => void) => {
         if (!callback) throw Error(`Argument 'callback' cannot be null.`);
-        callback(this.routing);
+        callback(this.config.routing);
     }
 
     start = (options: StartOptions = {}): interfaces.IBus => {
         console.log("Starting endpoint...")
-        var bus = new Bus(this.transport, this.routing, this.handling);
+        this.config.container.bind<IProvideEndpointConfiguration>(interfaces.TYPES.IProvideEnpointConfiguration).toConstantValue(this.config);
+        this.config.container.bind<Bus>(interfaces.TYPES.Bus).to(Bus).inSingletonScope();
 
-        if (options.sendOnly && this.handling.areRegistered()) 
+        var bus = this.config.container.get<Bus>(interfaces.TYPES.Bus);
+
+        //var bus = new Bus(this.config.transport, this.config.routing, this.config.handling);
+
+        if (options.sendOnly && this.config.handling.areRegistered()) 
             throw new Error('Registering handlers is not supported when running in SendOnly mode.');
 
         if (!options.sendOnly) {
@@ -52,7 +54,7 @@ export default class Endpoint {
 
     handlers = (callback: (handling: interfaces.IHandlingConfiguration) => void) => {
         if (!callback) throw new Error(`Argument 'callback' cannot be null.`);
-        callback(this.handling);
+        callback(this.config.handling);
     }
 
     sendOnly = (): interfaces.IBus => {
