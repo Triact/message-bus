@@ -4,7 +4,7 @@ import BakeCake from '../messages/BakeCake';
 
 export default class Bakery implements IHandleMessages<BakeCake> {
     
-    handle = (msg: BakeCake) => {
+    handle = async (msg: BakeCake) => {
 
         console.log(`Baking cake ${msg.type}`);
     }

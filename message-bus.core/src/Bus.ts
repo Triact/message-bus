@@ -1,20 +1,26 @@
-import "reflect-metadata";
 import { injectable } from "inversify";
-import * as interfaces from './interfaces';
 import { MessageHelper } from "./helpers/MessageHelper";
+import * as interfaces from './interfaces';
 
 @injectable()
 export default class Bus implements interfaces.IBus {
 
     private transport: interfaces.ITransport;
     private routing: interfaces.IRoutingConfiguration;
+    private handling: interfaces.IHandlingConfiguration;
 
-    constructor(transport: interfaces.ITransport, routing: interfaces.IRoutingConfiguration) {
+    constructor(transport: interfaces.ITransport, routing: interfaces.IRoutingConfiguration, handling: interfaces.IHandlingConfiguration) {
         if (!transport) throw new Error(`Argumet 'transport' cannot be null`);
         if (!routing) throw new Error(`Argument 'routing' cannot be null.`);
+        if (!handling) throw new Error(`Argument 'handling' cannot be null.`);
 
         this.transport = transport;
         this.routing = routing;
+        this.handling = handling;
+    }
+
+    startListening = () => {
+        this.transport.createConsumers(this.routing, this.handling);
     }
 
     publish = <T>(msgCtor: new (...args: any[]) => T, populateMessageCallback: (m:T) => void) => {

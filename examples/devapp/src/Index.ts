@@ -1,11 +1,9 @@
-import { interfaces } from 'message-bus.core';
-import EventCreated from './messages/EventCreated';
-import CreateEvent from './messages/CreateEvent';
-import { TYPES } from "./config/Types";
-import { Container } from 'inversify';
-import { Composer } from './config/Composer';
-import * as AWS from 'aws-sdk';
 import * as customEnv from 'custom-env';
+import { Container } from 'inversify';
+import { interfaces } from 'message-bus.core';
+import { Composer } from './config/Composer';
+import { TYPES } from "./config/Types";
+import CreateEvent from './messages/CreateEvent';
 
 
 console.log("Starting...");
@@ -27,7 +25,7 @@ const bus = container.get<interfaces.IBus>(TYPES.IBus);
 //     m.eventId = 'blabla'; 
 // });
 
-bus.send<CreateEvent>(CreateEvent, (m: CreateEvent) => {
-    m.eventId = '1';
-    m.name = 'Test event';
-})
+// bus.send<CreateEvent>(CreateEvent, (m: CreateEvent) => {
+//     m.eventId = '1';
+//     m.name = 'Test event';
+// })
