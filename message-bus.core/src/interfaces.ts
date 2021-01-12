@@ -9,7 +9,7 @@ export interface IBus {
 export interface ITransport {
     publish<T>(msg: T, msgType: string, topic: string): void;
     send<T>(msg: T, msgType: string, topic: string): void;
-    createConsumers(routesProvides: IProvideRoutes, handlerProvider: IProvideMessageHandler): void;
+    createConsumers(routesProvides: IProvideRoutes, handlerProvider: IProvideMessageHandlers): void;
 }
 
 export interface IRoutingConfiguration extends IProvideRoutes {
@@ -21,11 +21,11 @@ export interface IProvideRoutes {
     getRoutes(): RouteDefinition<IMessage>[];
 }
 
-export interface IHandlingConfiguration extends IProvideMessageHandler {
+export interface IHandlingConfiguration extends IProvideMessageHandlers {
     handleMessages<T>(msgCtor: new (...args: any[]) => T, handler: IHandleMessages<T>): void;
 }
 
-export interface IProvideMessageHandler {
+export interface IProvideMessageHandlers {
     getHandlersForMessageType<T>(msgCtor: new (...args: any[]) => T, msgType: MessageType): IHandleMessages<T>[];
 }
 

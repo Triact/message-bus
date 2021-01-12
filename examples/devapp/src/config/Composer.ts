@@ -23,7 +23,8 @@ export class Composer {
             region: process.env.AWS_REGION
         });
 
-        const endpoint = new Endpoint();
+        const endpoint = new Endpoint('dev-endpoint-queue');
+        endpoint.useExistingContainer(this.container);
         //endpoint.useTransport<AmazonTransport>(new AmazonTransport(awsConfig));
         endpoint.useTransport<AmazonTransport>(new AmazonTransport({
             awsConfig: awsConfig,

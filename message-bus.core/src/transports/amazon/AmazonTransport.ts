@@ -22,7 +22,7 @@ export class AmazonTransport implements interfaces.ITransport {
         this.sqs = new AWS.SQS(options.awsConfig);
     }
 
-    createConsumers(routesProvides: interfaces.IProvideRoutes, handlerProvider: interfaces.IProvideMessageHandler): void {
+    createConsumers(routesProvides: interfaces.IProvideRoutes, handlerProvider: interfaces.IProvideMessageHandlers): void {
         var routes = routesProvides.getRoutes()
 
         console.log("### creating consumers")

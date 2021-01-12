@@ -1,3 +1,4 @@
+import { Container } from 'inversify';
 import Bus from './Bus';
 import HandlingConfiguration from './Configuration/HandlingConfiguration';
 import RoutingConfiguration from './Configuration/RoutingConfiguration';
@@ -9,12 +10,19 @@ interface StartOptions {
 
 export default class Endpoint {
 
+    private name: string;
+    private container: Container;
     private routing = new RoutingConfiguration();
     private handling = new HandlingConfiguration();
     private transport: interfaces.ITransport;
 
-    constructor() {
-        //console.log('###', (AWS.config.credentials as any).profile);
+    constructor(name: string) {
+        this.name = name;
+    }
+
+    useExistingContainer = (container: Container) => {
+        if (!container) throw new Error(`Argument 'container' cannot be null.`);
+        this.container = container;
     }
 
     useTransport = <T extends interfaces.ITransport>(transport: T) => {
@@ -28,7 +36,7 @@ export default class Endpoint {
     }
 
     start = (options: StartOptions = {}): interfaces.IBus => {
-        console.log("### Starting endpoint")
+        console.log("Starting endpoint...")
         var bus = new Bus(this.transport, this.routing, this.handling);
 
         if (options.sendOnly && this.handling.areRegistered()) 
@@ -38,6 +46,7 @@ export default class Endpoint {
             bus.startListening();
         }
 
+        console.log('Endpoint stated.');
         return bus;
     }
 

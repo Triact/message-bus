@@ -1,7 +1,7 @@
 import { MessageHelper } from '../helpers/MessageHelper';
 import * as interfaces from '../interfaces';
 
-export default class HandlingConfiguration implements interfaces.IHandlingConfiguration, interfaces.IProvideMessageHandler {
+export default class HandlingConfiguration implements interfaces.IHandlingConfiguration, interfaces.IProvideMessageHandlers {
 
     private handlers: any = {};
 
