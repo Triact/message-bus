@@ -1,5 +1,5 @@
 export type MessageType = (string | symbol);
-export type RouteDefinition = { msg: string, topic: string };
+export type RouteDefinition<T> = { msgType: MessageType, topic: string, msgCtor: new (...args: any[]) => T };
 
 export interface IBus {
     publish<T>(ctor: new (...args: any[]) => T, populateMessageCallback: (m: T) => void): void;
@@ -18,7 +18,7 @@ export interface IRoutingConfiguration extends IProvideRoutes {
 }
 
 export interface IProvideRoutes {
-    getRoutes(): RouteDefinition[];
+    getRoutes(): RouteDefinition<IMessage>[];
 }
 
 export interface IHandlingConfiguration extends IProvideMessageHandler {
@@ -26,11 +26,15 @@ export interface IHandlingConfiguration extends IProvideMessageHandler {
 }
 
 export interface IProvideMessageHandler {
-    getHandler(msgType: string): IHandleMessages<any>;
+    getHandler<T>(msgCtor: new (...args: any[]) => T, msgType: MessageType): IHandleMessages<T>;
 }
 
 export interface IHandleMessages<T> {
     handle(msg: T): Promise<void>;
+}
+
+export interface IMessage {
+
 }
 
 export class MessagePurposes {

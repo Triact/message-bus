@@ -28,6 +28,7 @@ export default class Endpoint {
     }
 
     start = (options: StartOptions = {}): interfaces.IBus => {
+        console.log("### Starting endpoint")
         var bus = new Bus(this.transport, this.routing, this.handling);
 
         if (options.sendOnly && this.handling.areRegistered()) 

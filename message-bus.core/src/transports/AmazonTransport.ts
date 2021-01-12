@@ -11,7 +11,7 @@ export class AmazonTransport implements interfaces.ITransport {
 
     private sns: AWS.SNS;
     private sqs: AWS.SQS;
-    private consumers: AmazonConsumer[] = [];
+    private consumers: any[] = [];
 
     constructor(options: AmazonTransportOptions) {
         if (!options) throw Error(`Argument 'options' cannot be null.`);
@@ -22,17 +22,20 @@ export class AmazonTransport implements interfaces.ITransport {
     }
 
     createConsumers(routesProvides: interfaces.IProvideRoutes, handlerProvider: interfaces.IProvideMessageHandler): void {
-        routesProvides.getRoutes().forEach((r) => {
-            let handler = handlerProvider.getHandler(r.msg);
+        var routes = routesProvides.getRoutes()
+
+        console.log("### creating consumers")
+        routes.forEach((r) => {
+            console.log(r);
 
             let consumer = new AmazonConsumer({
                 sqs: this.sqs,
                 queueUrl: r.topic,
-                handleMessage: handler.handle
+                handler: handlerProvider.getHandler(r.msgCtor, r.msgType)
             });
 
             consumer.start();
-            
+
             this.consumers.push(consumer);
         });
     }
@@ -67,20 +70,21 @@ export class AmazonTransport implements interfaces.ITransport {
     }
 }
 
-interface AmazonConsumerOptions {
+interface AmazonConsumerOptions<T> {
     sqs: SQS;
     queueUrl: string;
-    handleMessage: (message: SQS.Message) => Promise<void>
+    handler: interfaces.IHandleMessages<T>
 }
 
-class AmazonConsumer {
-    private options: AmazonConsumerOptions;
+class AmazonConsumer<T> {
+    private options: AmazonConsumerOptions<T>;
 
-    constructor(options: AmazonConsumerOptions) {
+    constructor(options: AmazonConsumerOptions<T>) {
         this.options = options;
     }
 
-    public start = (): void => {
+    public start = async () => {
+        //console.log("### starting consumer", this.options)
         this.poll();
     }
 
@@ -90,10 +94,12 @@ class AmazonConsumer {
                 .receiveMessage({ QueueUrl: this.options.queueUrl })
                 .promise()
                 .then(this.handleResponse);
+
+            setTimeout(this.poll, 1000);
         } catch (err) {
-            console.error(err);
+            console.error('pollerr', err);
         } finally {
-            setTimeout(this.poll, 10);
+            //setTimeout(this.poll, 1000);
         }
     }
 
@@ -109,11 +115,13 @@ class AmazonConsumer {
 
     private processMessage = async (message: SQS.Message): Promise<void> => {
         try {
-            await this.options.handleMessage(message);
+
+            console.log(this.options.handler.handle, message);
+            await this.options.handler.handle(JSON.parse(message.Body!) as T);
             await this.deleteMessage(message);
         }
-        catch {
-
+        catch (err) {
+            console.error('processMessage', err);
         }
     }
 
@@ -129,7 +137,7 @@ class AmazonConsumer {
                 .deleteMessage(deleteParams)
                 .promise();
         } catch (err) {
-            //throw toSQSError(err, `SQS delete message failed: ${err.message}`);
+            console.error('deleteMessage', err);
         }
     }
 

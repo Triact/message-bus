@@ -1,6 +1,6 @@
 import * as interfaces from '../interfaces';
 
-export default class RoutingConfiguration implements interfaces.IRoutingConfiguration, interfaces.IProvideRoutes {
+export default class RoutingConfiguration implements interfaces.IRoutingConfiguration {
 
     private routes: any = {};
 
@@ -16,12 +16,13 @@ export default class RoutingConfiguration implements interfaces.IRoutingConfigur
         const msgPurpose = Reflect.getMetadata('MessagePurpose', msg);
         if (msgPurpose !== interfaces.MessagePurposes.EVENT) throw new Error(`Unable to route ${msgPurpose} to topics. Only events can be routed to topics.`);
 
-        this.routes[msgType] = topic;
+        this.routes[msgType] = { topic: topic, msgCtor: msgCtor };
     }
 
-    getRoutes(): interfaces.RouteDefinition[] {
-        return Object.getOwnPropertyNames(this.routes).map(o => {
-            return { msg: o, topic: this.routes[o] }
+    getRoutes(): interfaces.RouteDefinition<interfaces.IMessage>[] {
+        console.log(this.routes);
+        return Object.getOwnPropertySymbols(this.routes).map(o => {
+            return { msgType: o, topic: this.routes[o].topic, msgCtor: this.routes[o].msgCtor }
         });
     }
 
@@ -37,7 +38,7 @@ export default class RoutingConfiguration implements interfaces.IRoutingConfigur
         const msgPurpose = Reflect.getMetadata('MessagePurpose', msg);
         if (msgPurpose !== interfaces.MessagePurposes.COMMAND) throw new Error(`Unable to route ${msgPurpose} to topics. Only commands can be routed to queues.`);
 
-        this.routes[msgType] = queue;
+        this.routes[msgType] = { topic: queue, msgCtor: msgCtor };
     }
 
     getDestination = <T>(msg: T): { msgType: string, topic: string } => {
@@ -45,7 +46,7 @@ export default class RoutingConfiguration implements interfaces.IRoutingConfigur
         if (!(msgType in this.routes)) throw Error(`Route for message:${msgType.toString()} not found.`);
         return {
             msgType: msgType,
-            topic: this.routes[msgType]
+            topic: this.routes[msgType].topic
         };
     }
 }
