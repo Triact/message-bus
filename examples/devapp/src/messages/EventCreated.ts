@@ -1,6 +1,6 @@
-import { event } from 'message-bus.core';
+import { event, interfaces } from 'message-bus.core';
 
 @event(Symbol.for('Eventcreated'))
-export default class EventCreated {
+export default class EventCreated implements interfaces.IMessage {
     eventId: string;
 }
