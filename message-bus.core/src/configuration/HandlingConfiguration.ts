@@ -12,9 +12,6 @@ export default class HandlingConfiguration implements interfaces.IHandlingConfig
         let msg = new msgCtor();
         let msgType = MessageHelper.getMessageType(msg);
 
-        if (this.handlers[msgType] && this.handlers[msgType].includes(handler))
-            throw new Error(`Handler already registered for message:${msgType.toString()}`);
-
         if (!this.handlers[msgType])
             this.handlers[msgType] = [];
 
@@ -30,7 +27,6 @@ export default class HandlingConfiguration implements interfaces.IHandlingConfig
 
 
     areRegistered = () => {
-        console.log('###', this.handlers);
-        return this.handlers.length > 0;
+        return Object.keys(this.handlers).length > 0;
     }
 }
