@@ -26,7 +26,7 @@ export interface IHandlingConfiguration extends IProvideMessageHandler {
 }
 
 export interface IProvideMessageHandler {
-    getHandler<T>(msgCtor: new (...args: any[]) => T, msgType: MessageType): IHandleMessages<T>;
+    getHandlersForMessageType<T>(msgCtor: new (...args: any[]) => T, msgType: MessageType): IHandleMessages<T>[];
 }
 
 export interface IHandleMessages<T> {

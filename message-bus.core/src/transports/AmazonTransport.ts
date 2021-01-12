@@ -31,8 +31,11 @@ export class AmazonTransport implements interfaces.ITransport {
             let consumer = new AmazonConsumer({
                 sqs: this.sqs,
                 queueUrl: r.topic,
-                handler: handlerProvider.getHandler(r.msgCtor, r.msgType)
+                handlers: handlerProvider.getHandlersForMessageType(r.msgCtor, r.msgType)
             });
+
+            console.log('### HANDLER', consumer.options.handlers)
+            consumer.options.handlers[0].handle({});
 
             consumer.start();
 
@@ -73,11 +76,12 @@ export class AmazonTransport implements interfaces.ITransport {
 interface AmazonConsumerOptions<T> {
     sqs: SQS;
     queueUrl: string;
-    handler: interfaces.IHandleMessages<T>
+    handlers: interfaces.IHandleMessages<T>[]
 }
 
 class AmazonConsumer<T> {
-    private options: AmazonConsumerOptions<T>;
+    //private options: AmazonConsumerOptions<T>;
+    options: AmazonConsumerOptions<T>;
 
     constructor(options: AmazonConsumerOptions<T>) {
         this.options = options;
@@ -116,8 +120,8 @@ class AmazonConsumer<T> {
     private processMessage = async (message: SQS.Message): Promise<void> => {
         try {
 
-            console.log(this.options.handler.handle, message);
-            await this.options.handler.handle(JSON.parse(message.Body!) as T);
+            console.log(this.options.handlers[0].handle, message);
+            await this.options.handlers[0].handle(JSON.parse(message.Body!) as T);
             await this.deleteMessage(message);
         }
         catch (err) {
