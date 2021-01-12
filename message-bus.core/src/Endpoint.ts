@@ -31,8 +31,11 @@ export default class Endpoint {
         console.log("### Starting endpoint")
         var bus = new Bus(this.transport, this.routing, this.handling);
 
+        if (options.sendOnly && this.handling.areRegistered()) 
+            throw new Error('Registering handlers is not supported when running in SendOnly mode.');
+
         if (!options.sendOnly) {
-            bus.listen();
+            bus.startListening();
         }
 
         return bus;
@@ -44,7 +47,6 @@ export default class Endpoint {
     }
 
     sendOnly = (): interfaces.IBus => {
-        if (this.handling.areRegistered()) throw new Error('Registering handlers is not supported when running in SendOnly mode.');
-        return new Bus(this.transport, this.routing, this.handling);
+        return this.start({sendOnly: true});
     }
 }

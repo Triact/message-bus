@@ -2,15 +2,23 @@ import * as AWS from 'aws-sdk';
 import { SQS } from 'aws-sdk';
 import * as interfaces from "../interfaces";
 
+interface AmazonTransportOptions {
+    awsConfig: AWS.Config;
+    useLambda: boolean | undefined;
+}
+
 export class AmazonTransport implements interfaces.ITransport {
 
     private sns: AWS.SNS;
     private sqs: AWS.SQS;
     private consumers: any[] = [];
 
-    constructor(awsConfig: AWS.Config) {
-        this.sns = new AWS.SNS(awsConfig);
-        this.sqs = new AWS.SQS(awsConfig);
+    constructor(options: AmazonTransportOptions) {
+        if (!options) throw Error(`Argument 'options' cannot be null.`);
+        if (!options.awsConfig) throw new Error(`Argument 'options.awsConfig' cannot be null.`);
+
+        this.sns = new AWS.SNS(options.awsConfig);
+        this.sqs = new AWS.SQS(options.awsConfig);
     }
 
     createConsumers(routesProvides: interfaces.IProvideRoutes, handlerProvider: interfaces.IProvideMessageHandler): void {
@@ -23,8 +31,11 @@ export class AmazonTransport implements interfaces.ITransport {
             let consumer = new AmazonConsumer({
                 sqs: this.sqs,
                 queueUrl: r.topic,
-                handler: handlerProvider.getHandler(r.msgCtor, r.msgType)
+                handlers: handlerProvider.getHandlersForMessageType(r.msgCtor, r.msgType)
             });
+
+            console.log('### HANDLER', consumer.options.handlers)
+            consumer.options.handlers[0].handle({});
 
             consumer.start();
 
@@ -65,11 +76,12 @@ export class AmazonTransport implements interfaces.ITransport {
 interface AmazonConsumerOptions<T> {
     sqs: SQS;
     queueUrl: string;
-    handler: interfaces.IHandleMessages<T>
+    handlers: interfaces.IHandleMessages<T>[]
 }
 
 class AmazonConsumer<T> {
-    private options: AmazonConsumerOptions<T>;
+    //private options: AmazonConsumerOptions<T>;
+    options: AmazonConsumerOptions<T>;
 
     constructor(options: AmazonConsumerOptions<T>) {
         this.options = options;
@@ -108,8 +120,8 @@ class AmazonConsumer<T> {
     private processMessage = async (message: SQS.Message): Promise<void> => {
         try {
 
-            console.log(this.options.handler.handle, message);
-            await this.options.handler.handle(JSON.parse(message.Body!) as T);
+            console.log(this.options.handlers[0].handle, message);
+            await this.options.handlers[0].handle(JSON.parse(message.Body!) as T);
             await this.deleteMessage(message);
         }
         catch (err) {

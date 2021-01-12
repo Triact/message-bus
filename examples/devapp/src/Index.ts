@@ -25,7 +25,7 @@ const bus = container.get<interfaces.IBus>(TYPES.IBus);
 //     m.eventId = 'blabla'; 
 // });
 
-bus.send<CreateEvent>(CreateEvent, (m: CreateEvent) => {
-    m.eventId = '1';
-    m.name = 'Test event';
-})
+// bus.send<CreateEvent>(CreateEvent, (m: CreateEvent) => {
+//     m.eventId = '1';
+//     m.name = 'Test event';
+// })
