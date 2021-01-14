@@ -25,11 +25,11 @@ export class Composer {
 
         const endpoint = new Endpoint('dev-endpoint-queue');
         endpoint.useExistingContainer(this.container);
-        //endpoint.useTransport<AmazonTransport>(new AmazonTransport(awsConfig));
-        endpoint.useTransport<AmazonTransport>(new AmazonTransport({
-            awsConfig: awsConfig,
-            useLambda: false
-        }));
+        endpoint.useTransport<AmazonTransport>(AmazonTransport, transport => {
+            transport
+                .awsConfig(awsConfig)
+                .useLambda();
+        });
         endpoint.routes(routing => {
             //routing.routeToTopic<EventCreated>(EventCreated, `arn:aws:sns:${awsConfig.region}:${process.env.AWS_ACCOUNT_ID}:tijdprikker_event-created`);
             //routing.routeToEndpoint<CreateEvent>(CreateEvent, `https://sqs.${awsConfig.region}.amazonaws.com/${process.env.AWS_ACCOUNT_ID}/tijdprikker_SlackNotifier`);            

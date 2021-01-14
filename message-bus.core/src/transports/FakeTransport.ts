@@ -1,6 +1,6 @@
 import * as interfaces from "../interfaces";
 
-export class FakeTransport implements interfaces.ITransport {
+export class FakeTransport implements interfaces.ITransportImplementation {
     
     createConsumers(): void {
         throw new Error("Method not implemented.");

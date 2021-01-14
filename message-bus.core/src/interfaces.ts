@@ -1,9 +1,13 @@
+import { interfaces as inversifyInterfaces } from 'inversify';
+
 export type MessageType = (string | symbol);
 export type RouteDefinition<T> = { msgType: MessageType, topic: string, msgCtor: new (...args: any[]) => T };
 
 export const TYPES = {
     IProvideEnpointConfiguration: Symbol.for('IProvideEndpointConfiguration'),
-    Bus: Symbol.for('Bus')
+    Bus: Symbol.for('Bus'),
+    ITransport: Symbol.for('ITransport'),
+    ITransportImplementation: Symbol.for('ITransportImplementation')
 }
 
 // Endpoint Configuration
@@ -28,6 +32,13 @@ export interface IBus {
 }
 
 export interface ITransport {
+    configure(container: inversifyInterfaces.Container) : void;
+}
+
+export interface ITransportConfiguration {
+}
+
+export interface ITransportImplementation {
     publish<T>(msg: T, msgType: string, topic: string): void;
     send<T>(msg: T, msgType: string, topic: string): void;
     createConsumers(routesProvides: IProvideRoutes, handlerProvider: IProvideMessageHandlers): void;

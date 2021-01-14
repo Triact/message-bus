@@ -15,16 +15,20 @@ export default class Endpoint {
 
     constructor(name: string) {
         this.config.endpointName = name;
+        this.config.container = new Container();
     }
 
     useExistingContainer = (container: Container) => {
         if (!container) throw new Error(`Argument 'container' cannot be null.`);
-        this.config.container = container;
+        this.config.container = Container.merge(this.config.container, container);
     }
 
-    useTransport = <T extends interfaces.ITransport>(transport: T) => {
-        if (!transport) throw new Error(`Argument 'transport' cannot be null.`);
-        this.config.transport = transport;
+    useTransport = <T extends interfaces.ITransport>(ctor: new (...args: any[])=> T, callback: (transport: T) => void) => {
+        if (!ctor) throw new Error(`Argument 'ctor' cannot be null.`);
+
+        let transport = new ctor();
+        callback(transport);
+        transport.configure(this.config.container);
     }
 
     routes = (callback: (routing: RoutingConfiguration) => void) => {
