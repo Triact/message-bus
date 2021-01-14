@@ -1,4 +1,4 @@
-import { Container } from 'inversify';
+import { interfaces as inversifyInterfaces, Container } from 'inversify';
 import Bus from './Bus';
 import EndpointConfiguration, { IProvideEndpointConfiguration } from './configuration/EndpointConfiguration'
 import HandlingConfiguration from './configuration/HandlingConfiguration';
@@ -11,16 +11,17 @@ interface StartOptions {
 
 export default class Endpoint {
 
+    private container: inversifyInterfaces.Container;
     private config = new EndpointConfiguration();
 
     constructor(name: string) {
         this.config.endpointName = name;
-        this.config.container = new Container();
+        this.container = new Container();
     }
 
     useExistingContainer = (container: Container) => {
         if (!container) throw new Error(`Argument 'container' cannot be null.`);
-        this.config.container = Container.merge(this.config.container, container);
+        this.container = Container.merge(this.container, container);
     }
 
     useTransport = <T extends interfaces.ITransport>(ctor: new (...args: any[])=> T, callback: (transport: T) => void) => {
@@ -28,7 +29,7 @@ export default class Endpoint {
 
         let transport = new ctor();
         callback(transport);
-        transport.configure(this.config.container);
+        transport.configure(this.container);
     }
 
     routes = (callback: (routing: RoutingConfiguration) => void) => {
@@ -38,10 +39,10 @@ export default class Endpoint {
 
     start = (options: StartOptions = {}): interfaces.IBus => {
         console.log("Starting endpoint...")
-        this.config.container.bind<IProvideEndpointConfiguration>(interfaces.TYPES.IProvideEnpointConfiguration).toConstantValue(this.config);
-        this.config.container.bind<Bus>(interfaces.TYPES.Bus).to(Bus).inSingletonScope();
+        this.container.bind<IProvideEndpointConfiguration>(interfaces.TYPES.IProvideEnpointConfiguration).toConstantValue(this.config);
+        this.container.bind<Bus>(interfaces.TYPES.Bus).to(Bus).inSingletonScope();
 
-        var bus = this.config.container.get<Bus>(interfaces.TYPES.Bus);
+        var bus = this.container.get<Bus>(interfaces.TYPES.Bus);
 
         //var bus = new Bus(this.config.transport, this.config.routing, this.config.handling);
 
