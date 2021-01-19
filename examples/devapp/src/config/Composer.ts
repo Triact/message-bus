@@ -40,7 +40,6 @@ export class Composer {
             //handling.handleMessages<BakeCake>(BakeCake, new Bakery());
         });
 
-        console.log("dikke pik");
         const bus = endpoint.start();
 
         this.container.bind<interfaces.IBus>(TYPES.IBus).toConstantValue(bus);
