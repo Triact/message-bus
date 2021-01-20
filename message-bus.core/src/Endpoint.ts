@@ -14,6 +14,7 @@ export default class Endpoint {
     private container: inversifyInterfaces.Container;
     private config = new EndpointConfiguration();
     private transport: interfaces.ITransport;
+    private handlersCallback: (handling: interfaces.IHandlingConfiguration) => void;
     private customizeCallback: (container: inversifyInterfaces.Container) => void;
 
     constructor(name: string) {
@@ -42,6 +43,11 @@ export default class Endpoint {
         this.customizeCallback = callback;
     }
 
+    handlers = (callback: (handling: interfaces.IHandlingConfiguration) => void) => {
+        if (!callback) throw new Error(`Argument 'callback' cannot be null.`);
+        this.handlersCallback = callback;
+    }
+
     start = (options: StartOptions = {}): interfaces.IBus => {
         console.log("Starting endpoint...")
         if (!this.container) this.container = new Container();
@@ -49,15 +55,22 @@ export default class Endpoint {
         this.container.bind<IProvideEndpointConfiguration>(interfaces.TYPES.IProvideEnpointConfiguration).toConstantValue(this.config);
         this.container.bind<Bus>(interfaces.TYPES.Bus).to(Bus).inSingletonScope();
         this.transport.configure(this.container);
-        
+
+        if (!options.sendOnly) {
+            if (this.handlersCallback) {
+                let handling = new HandlingConfiguration(this.container);
+                this.handlersCallback(handling);
+            }
+        }
+
         if (this.customizeCallback) this.customizeCallback(this.container);
 
         var bus = this.container.get<Bus>(interfaces.TYPES.Bus);
 
         //var bus = new Bus(this.config.transport, this.config.routing, this.config.handling);
 
-        if (options.sendOnly && this.config.handling.areRegistered()) 
-            throw new Error('Registering handlers is not supported when running in SendOnly mode.');
+        //if (options.sendOnly && this.config.handling.areRegistered()) 
+        //    throw new Error('Registering handlers is not supported when running in SendOnly mode.');
 
         if (!options.sendOnly) {
             bus.startListening();
@@ -65,12 +78,7 @@ export default class Endpoint {
 
         console.log('Endpoint started.');
         return bus;
-    }
-
-    handlers = (callback: (handling: interfaces.IHandlingConfiguration) => void) => {
-        if (!callback) throw new Error(`Argument 'callback' cannot be null.`);
-        callback(this.config.handling);
-    }
+    }   
 
     sendOnly = (): interfaces.IBus => {
         return this.start({sendOnly: true});

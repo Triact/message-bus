@@ -8,20 +8,32 @@ export default class Bus implements interfaces.IBus {
 
     private _endpointConfigProvider: IProvideEndpointConfiguration;
     private _transportImplementation: interfaces.ITransportImplementation;
+    private _messageHandlerProvider: interfaces.IProvideMessageHandlers;
 
     constructor(
         @inject(interfaces.TYPES.IProvideEnpointConfiguration) endpointConfigurationProvider: IProvideEndpointConfiguration,
-        @inject(interfaces.TYPES.ITransportImplementation) transportImplementation: interfaces.ITransportImplementation
+        @inject(interfaces.TYPES.ITransportImplementation) transportImplementation: interfaces.ITransportImplementation,
+        @inject(interfaces.TYPES.IProvideMessageHandlers) messageHandlerProvider: interfaces.IProvideMessageHandlers
     ) {    
         if (!endpointConfigurationProvider) throw new Error(`Argument 'endpointConfigurationProvider' cannot be null.`);
         if (!transportImplementation) throw new Error(`Argument 'transportImplementation' cannot be null.`);
 
         this._endpointConfigProvider = endpointConfigurationProvider;
         this._transportImplementation = transportImplementation;
+        this._messageHandlerProvider = messageHandlerProvider;
     }
 
     startListening = () => {
-        this._transportImplementation.createConsumers(this._endpointConfigProvider.routing, this._endpointConfigProvider.handling);
+
+        console.log('Start listening...');
+        this._transportImplementation.startListening(this.handleMessage);
+        
+        //this._transportImplementation.createConsumers(this._endpointConfigProvider.routing, this._endpointConfigProvider.handling);
+    }
+
+    private handleMessage = (msgType: interfaces.MessageType, msg: any) => {
+        let handlers = this._messageHandlerProvider.getHandlersForMessageType(msgType);
+        handlers.map(h => h.handle(msg));
     }
 
     publish = <T>(msgCtor: new (...args: any[]) => T, populateMessageCallback: (m:T) => void) => {

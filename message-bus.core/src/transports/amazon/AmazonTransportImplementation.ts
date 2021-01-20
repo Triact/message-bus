@@ -20,25 +20,32 @@ export class AmazonTransportImplementation implements interfaces.ITransportImple
         this.sqs = new AWS.SQS(options.awsConfig);
     }
     
+    startListening = (messageReceivedCallback: (msgType: interfaces.MessageType, msg: any) => void) => {
+        
+        messageReceivedCallback(Symbol.for('BakeCake'), {
+            type: 'Cream Pie'
+        });
+    }
+
     createConsumers(routesProvides: interfaces.IProvideRoutes, handlerProvider: interfaces.IProvideMessageHandlers): void {
-        var routes = routesProvides.getRoutes()
-
         console.log("### creating consumers")
+        var routes = routesProvides.getRoutes();
+        
         routes.forEach((r) => {
-            console.log(r);
+            //console.log(r);
 
-            let consumer = new AmazonConsumer({
-                sqs: this.sqs,
-                queueUrl: r.topic,
-                handlers: handlerProvider.getHandlersForMessageType(r.msgCtor, r.msgType)
-            });
+            // let consumer = new AmazonConsumer({
+            //     sqs: this.sqs,
+            //     queueUrl: r.topic,
+            //     handlers: handlerProvider.getHandlersForMessageType(r.msgCtor, r.msgType)
+            // });
 
-            console.log('### HANDLER', consumer.options.handlers)
-            consumer.options.handlers[0].handle({});
+            // console.log('### HANDLER', consumer.options.handlers)
+            // consumer.options.handlers[0].handle({});
 
-            consumer.start();
+            // consumer.start();
 
-            this.consumers.push(consumer);
+            // this.consumers.push(consumer);
         });
     }
 
