@@ -14,12 +14,13 @@ export default class Endpoint {
     private container: inversifyInterfaces.Container;
     private config = new EndpointConfiguration();
     private transport: interfaces.ITransport;
+    private customizeCallback: (container: inversifyInterfaces.Container) => void;
 
     constructor(name: string) {
         this.config.endpointName = name;
     }
 
-    useExistingContainer = (container: Container) => {
+    useExistingContainer = (container: inversifyInterfaces.Container) => {
         if (!container) throw new Error(`Argument 'container' cannot be null.`);
         this.container = container;
     }
@@ -37,14 +38,19 @@ export default class Endpoint {
         callback(this.config.routing);
     }
 
+    customize = (callback: (container: inversifyInterfaces.Container) => void) => {
+        this.customizeCallback = callback;
+    }
+
     start = (options: StartOptions = {}): interfaces.IBus => {
         console.log("Starting endpoint...")
         if (!this.container) this.container = new Container();
 
         this.container.bind<IProvideEndpointConfiguration>(interfaces.TYPES.IProvideEnpointConfiguration).toConstantValue(this.config);
         this.container.bind<Bus>(interfaces.TYPES.Bus).to(Bus).inSingletonScope();
-        
         this.transport.configure(this.container);
+        
+        if (this.customizeCallback) this.customizeCallback(this.container);
 
         var bus = this.container.get<Bus>(interfaces.TYPES.Bus);
 
