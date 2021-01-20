@@ -1,16 +1,8 @@
 import * as interfaces from "../interfaces";
+import { interfaces as inversifyInterfaces } from 'inversify';
 
-export class FakeTransport implements interfaces.ITransportImplementation {
+export class FakeTransport implements interfaces.ITransport {
     
-    createConsumers(): void {
-        throw new Error("Method not implemented.");
-    }
-    
-    publish = <T>(msg: T, msgType: string, topic: string) => {
-        console.log(`FAKE TRANSPORT: publish message ${msgType} to ${topic}.\n${JSON.stringify(msg)}`);
-    }
-
-    send = <T>(msg: T, msgType: string, topic: string) => {
-        console.log(`FAKE TRANSPORT: send message ${msgType} to ${topic}.\n${JSON.stringify(msg)}`);
+    configure = (container: inversifyInterfaces.Container) => {
     }
 }

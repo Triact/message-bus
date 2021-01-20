@@ -20,7 +20,7 @@ const serverlessConfiguration: AWS = {
   },
   functions: {
     handleWithMessageBus: {
-      handler: 'handler.handle',
+      handler: 'messageBusHandler.handle',
       events: [{
         sqs: {
           arn: {

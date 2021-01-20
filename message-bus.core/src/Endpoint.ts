@@ -13,15 +13,15 @@ export default class Endpoint {
 
     private container: inversifyInterfaces.Container;
     private config = new EndpointConfiguration();
+    private transport: interfaces.ITransport;
 
     constructor(name: string) {
         this.config.endpointName = name;
-        this.container = new Container();
     }
 
     useExistingContainer = (container: Container) => {
         if (!container) throw new Error(`Argument 'container' cannot be null.`);
-        this.container = Container.merge(this.container, container);
+        this.container = container;
     }
 
     useTransport = <T extends interfaces.ITransport>(ctor: new (...args: any[])=> T, callback: (transport: T) => void) => {
@@ -29,7 +29,7 @@ export default class Endpoint {
 
         let transport = new ctor();
         callback(transport);
-        transport.configure(this.container);
+        this.transport = transport;        
     }
 
     routes = (callback: (routing: RoutingConfiguration) => void) => {
@@ -39,8 +39,12 @@ export default class Endpoint {
 
     start = (options: StartOptions = {}): interfaces.IBus => {
         console.log("Starting endpoint...")
+        if (!this.container) this.container = new Container();
+
         this.container.bind<IProvideEndpointConfiguration>(interfaces.TYPES.IProvideEnpointConfiguration).toConstantValue(this.config);
         this.container.bind<Bus>(interfaces.TYPES.Bus).to(Bus).inSingletonScope();
+        
+        this.transport.configure(this.container);
 
         var bus = this.container.get<Bus>(interfaces.TYPES.Bus);
 
@@ -53,7 +57,7 @@ export default class Endpoint {
             bus.startListening();
         }
 
-        console.log('Endpoint stated.');
+        console.log('Endpoint started.');
         return bus;
     }
 

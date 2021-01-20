@@ -4,9 +4,10 @@
   "description": "Serverless webpack example using Typescript",
   "main": "handler.js",
   "scripts": {
-    "test": "jest",
+    "test": "jest --detectOpenHandles",
     "invoke-local": "serverless invoke local -f handleWithMessageBus -l",
-    "deploy": "serverless deploy function -f handleWithMessageBus --aws-profile aws-triact --stage dev"
+    "deploy": "serverless deploy function -f handleWithMessageBus --aws-profile aws-triact --stage dev",
+    "link": "npm link ../../message-bus.core"
   },
   "dependencies": {
     "source-map-support": "^0.5.19"
@@ -16,7 +17,6 @@
     "@types/aws-lambda": "^8.10.64",
     "@types/jest": "^26.0.20",
     "@types/node": "^14.14.6",
-    "aws-lambda-mock-context": "^3.2.1",
     "fork-ts-checker-webpack-plugin": "^6.0.0",
     "jest": "^26.6.3",
     "serverless-webpack": "^5.2.0",

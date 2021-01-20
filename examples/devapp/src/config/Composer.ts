@@ -14,7 +14,7 @@ export class Composer {
         this.container = container;
     }
 
-    compose = () => {
+    compose = () : interfaces.IBus => {
         // AWS configuration
         const awsCredentials = new AWS.SharedIniFileCredentials({ profile: process.env.AWS_PROFILE });
         const awsConfig = new AWS.Config();
@@ -29,7 +29,7 @@ export class Composer {
             transport
                 .awsConfig(awsConfig)
                 .useLambda();
-        });
+        });                
         endpoint.routes(routing => {
             //routing.routeToTopic<EventCreated>(EventCreated, `arn:aws:sns:${awsConfig.region}:${process.env.AWS_ACCOUNT_ID}:tijdprikker_event-created`);
             //routing.routeToEndpoint<CreateEvent>(CreateEvent, `https://sqs.${awsConfig.region}.amazonaws.com/${process.env.AWS_ACCOUNT_ID}/tijdprikker_SlackNotifier`);            
@@ -40,8 +40,6 @@ export class Composer {
             //handling.handleMessages<BakeCake>(BakeCake, new Bakery());
         });
 
-        const bus = endpoint.start();
-
-        this.container.bind<interfaces.IBus>(TYPES.IBus).toConstantValue(bus);
+        return endpoint.start();
     }
 }

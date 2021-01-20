@@ -17,9 +17,9 @@ customEnv.env(true);
 
 const container = new Container();
 const composer = new Composer(container);
-composer.compose();
+const bus = composer.compose();
 
-const bus = container.get<interfaces.IBus>(TYPES.IBus);
+const bus1 = container.get<interfaces.IBus>(interfaces.TYPES.Bus);
 
 // bus.publish<EventCreated>(EventCreated, (m: EventCreated) => { 
 //     m.eventId = 'blabla'; 

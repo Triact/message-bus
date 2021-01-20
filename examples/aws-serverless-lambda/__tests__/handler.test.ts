@@ -1,6 +1,6 @@
-import { handleWithMessageBus } from '../handler';
+import { handle } from '../messageBusHandler';
 import { SQSEvent, Context, Callback } from 'aws-lambda';
-import * as context from 'aws-lambda-mock-context';
+import { context } from '../__testmocks__/AwsLambdaMocks';
 
 test('correct event handler', async () => {
     const event:SQSEvent = {
@@ -9,7 +9,7 @@ test('correct event handler', async () => {
     const ctx:Context = context();
     const callback:Callback = jest.fn();
 
-    await handleWithMessageBus(event, ctx, callback);
+    await handle(event, ctx, callback);
     
     expect(callback).toHaveBeenCalledTimes(1);
     expect(callback).toHaveBeenCalledWith(null, 'OK');
