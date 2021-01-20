@@ -1,26 +1,27 @@
-import { injectable } from "inversify";
+import { inject, injectable } from "inversify";
+import { IProvideEndpointConfiguration } from "./configuration/EndpointConfiguration";
 import { MessageHelper } from "./helpers/MessageHelper";
 import * as interfaces from './interfaces';
 
 @injectable()
 export default class Bus implements interfaces.IBus {
 
-    private transport: interfaces.ITransport;
-    private routing: interfaces.IRoutingConfiguration;
-    private handling: interfaces.IHandlingConfiguration;
+    private _endpointConfigProvider: IProvideEndpointConfiguration;
+    private _transportImplementation: interfaces.ITransportImplementation;
 
-    constructor(transport: interfaces.ITransport, routing: interfaces.IRoutingConfiguration, handling: interfaces.IHandlingConfiguration) {
-        if (!transport) throw new Error(`Argumet 'transport' cannot be null`);
-        if (!routing) throw new Error(`Argument 'routing' cannot be null.`);
-        if (!handling) throw new Error(`Argument 'handling' cannot be null.`);
+    constructor(
+        @inject(interfaces.TYPES.IProvideEnpointConfiguration) endpointConfigurationProvider: IProvideEndpointConfiguration,
+        @inject(interfaces.TYPES.ITransportImplementation) transportImplementation: interfaces.ITransportImplementation
+    ) {    
+        if (!endpointConfigurationProvider) throw new Error(`Argument 'endpointConfigurationProvider' cannot be null.`);
+        if (!transportImplementation) throw new Error(`Argument 'transportImplementation' cannot be null.`);
 
-        this.transport = transport;
-        this.routing = routing;
-        this.handling = handling;
+        this._endpointConfigProvider = endpointConfigurationProvider;
+        this._transportImplementation = transportImplementation;
     }
 
     startListening = () => {
-        this.transport.createConsumers(this.routing, this.handling);
+        this._transportImplementation.createConsumers(this._endpointConfigProvider.routing, this._endpointConfigProvider.handling);
     }
 
     publish = <T>(msgCtor: new (...args: any[]) => T, populateMessageCallback: (m:T) => void) => {
@@ -33,9 +34,9 @@ export default class Bus implements interfaces.IBus {
 
         populateMessageCallback(msg);
 
-        const dest = this.routing.getDestination<T>(msg);
+        const dest = this._endpointConfigProvider.routing.getDestination<T>(msg);
 
-        this.transport.publish(msg, dest.msgType.toString(), dest.topic);
+        this._transportImplementation.publish(msg, dest.msgType.toString(), dest.topic);
     }
 
     send = <T>(msgCtor: new (...args: any[]) => T, populateMessageCallback: (m: T) => void) => {
@@ -48,8 +49,8 @@ export default class Bus implements interfaces.IBus {
 
         populateMessageCallback(msg);
 
-        const dest = this.routing.getDestination<T>(msg);
+        const dest = this._endpointConfigProvider.routing.getDestination<T>(msg);
 
-        this.transport.send(msg, dest.msgType.toString(), dest.topic);
+        this._transportImplementation.send(msg, dest.msgType.toString(), dest.topic);
     }
 }

@@ -5,5 +5,5 @@ export * as interfaces from './interfaces';
 export { event, command } from './decorators/messageDecorators';
 
 // Transports
-export { AmazonTransport } from './transports/amazon/AmazonTransport';
+export { AmazonTransport as AmazonTransport } from './transports/amazon/AmazonTransport';
 export { FakeTransport } from './transports/FakeTransport';

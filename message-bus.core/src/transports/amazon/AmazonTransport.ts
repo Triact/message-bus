@@ -1,77 +1,33 @@
 import * as AWS from 'aws-sdk';
 import { SQS } from 'aws-sdk';
+import { inject } from 'inversify';
+import { IProvideEndpointConfiguration } from '../../configuration/EndpointConfiguration';
 import * as interfaces from "../../interfaces";
+import { interfaces as inversifyInterfaces } from 'inversify';
+import * as amazonInterfaces from './interfaces';
 import AmazonConsumer from './AmazonConsumer';
+import { AmazonTransportImplementation } from './AmazonTransportImplementation';
+import { AmazonTransportOptions } from './AmazonTransportOptions';
 
-interface AmazonTransportOptions {
-    awsConfig: AWS.Config;
-    useLambda: boolean | undefined;
-}
 
 export class AmazonTransport implements interfaces.ITransport {
 
-    private sns: AWS.SNS;
-    private sqs: AWS.SQS;
-    private consumers: any[] = [];
-
-    constructor(options: AmazonTransportOptions) {
-        if (!options) throw Error(`Argument 'options' cannot be null.`);
-        if (!options.awsConfig) throw new Error(`Argument 'options.awsConfig' cannot be null.`);
-
-        this.sns = new AWS.SNS(options.awsConfig);
-        this.sqs = new AWS.SQS(options.awsConfig);
+    private readonly _options: AmazonTransportOptions = new AmazonTransportOptions();
+    
+    configure = (container: inversifyInterfaces.Container) => {
+        if (!container) throw new Error(`Argument 'container' cannot be null.`);
+        
+        container.bind(amazonInterfaces.TYPES.AmazonTransportOptions).toConstantValue(this._options);
+        container.bind(interfaces.TYPES.ITransportImplementation).to(AmazonTransportImplementation).inSingletonScope();
     }
 
-    createConsumers(routesProvides: interfaces.IProvideRoutes, handlerProvider: interfaces.IProvideMessageHandlers): void {
-        var routes = routesProvides.getRoutes()
-
-        console.log("### creating consumers")
-        routes.forEach((r) => {
-            console.log(r);
-
-            let consumer = new AmazonConsumer({
-                sqs: this.sqs,
-                queueUrl: r.topic,
-                handlers: handlerProvider.getHandlersForMessageType(r.msgCtor, r.msgType)
-            });
-
-            console.log('### HANDLER', consumer.options.handlers)
-            consumer.options.handlers[0].handle({});
-
-            consumer.start();
-
-            this.consumers.push(consumer);
-        });
+    awsConfig = (awsConfig: AWS.Config) :  AmazonTransport => {
+        this._options.awsConfig = awsConfig;
+        return this;
     }
 
-    publish = <T>(msg: T, msgType: string, topic: string) => {
-        this.sns.publish({
-            Message: JSON.stringify(msg),
-            TopicArn: topic,
-            MessageAttributes: {
-                'MessageBus.MessageType': { DataType: 'String', StringValue: msgType }
-            }
-        }, (error: AWS.AWSError, data: AWS.SNS.PublishResponse) => {
-            if (error) console.error("Error publishing message.", error);
-        });
-    }
-
-    send = <T>(msg: T, msgType: string, queue: string) => {
-        let params = {
-            DelaySeconds: 0,
-            MessageAttributes: {
-                "MessageBus.MessageType": {
-                    DataType: "String",
-                    StringValue: msgType
-                }
-            },
-            MessageBody: JSON.stringify(msg),
-            QueueUrl: queue
-        } as AWS.SQS.SendMessageRequest;
-        this.sqs.sendMessage(params, (error, data) => {
-            if (error) console.error('Error sending message.', error);
-        });
+    useLambda = () : AmazonTransport => {
+        this._options.useLambda = true;
+        return this;
     }
 }
-
-
