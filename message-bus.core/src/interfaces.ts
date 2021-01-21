@@ -44,7 +44,6 @@ export interface ITransportConfiguration {
 export interface ITransportImplementation {
     publish<T>(msg: T, msgType: string | undefined, topic: string): void;
     send<T>(msg: T, msgType: string | undefined, topic: string): void;
-    createConsumers(routesProvides: IProvideRoutes, handlerProvider: IProvideMessageHandlers): void;
     startListening(messageHandler: (msgType: MessageType, msg: any) => void): void;
 }
 

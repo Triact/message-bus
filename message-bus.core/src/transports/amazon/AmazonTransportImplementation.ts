@@ -12,7 +12,6 @@ export class AmazonTransportImplementation implements interfaces.ITransportImple
     private options: AmazonTransportOptions;
     private sns: AWS.SNS;
     private sqs: AWS.SQS;
-    //private consumers: any[] = [];
     private consumer: AmazonConsumer;
 
     constructor(
@@ -32,32 +31,6 @@ export class AmazonTransportImplementation implements interfaces.ITransportImple
             messageHandler: messageReceivedCallback
         });
         this.consumer.start();
-
-        // messageReceivedCallback(Symbol.for('BakeCake'), {
-        //     type: 'Cream Pie'
-        // });
-    }
-
-    createConsumers(routesProvides: interfaces.IProvideRoutes, handlerProvider: interfaces.IProvideMessageHandlers): void {
-        console.log("### creating consumers")
-        var routes = routesProvides.getRoutes();
-        
-        routes.forEach((r) => {
-            //console.log(r);
-
-            // let consumer = new AmazonConsumer({
-            //     sqs: this.sqs,
-            //     queueUrl: r.topic,
-            //     handlers: handlerProvider.getHandlersForMessageType(r.msgCtor, r.msgType)
-            // });
-
-            // console.log('### HANDLER', consumer.options.handlers)
-            // consumer.options.handlers[0].handle({});
-
-            // consumer.start();
-
-            // this.consumers.push(consumer);
-        });
     }
 
     publish = <T>(msg: T, msgType: string, topic: string) => {
