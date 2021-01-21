@@ -6,7 +6,6 @@ import * as interfaces from '../interfaces'
 export interface IProvideEndpointConfiguration {
     endpointName: string;
     routing: RoutingConfiguration;
-    //handling: HandlingConfiguration;
     transport: interfaces.ITransportImplementation;
 }
 
@@ -14,6 +13,5 @@ export interface IProvideEndpointConfiguration {
 export default class EndpointConfiguration implements IProvideEndpointConfiguration {
     endpointName: string;
     routing = new RoutingConfiguration();
-    //handling = new HandlingConfiguration();
     transport: interfaces.ITransportImplementation;
 }
