@@ -31,6 +31,6 @@ const bus1 = container.get<interfaces.IBus>(interfaces.TYPES.Bus);
 //     m.name = 'Test event';
 // })
 
-// bus.send<BakeCake>(BakeCake, (m: BakeCake) => {
-//     m.type = 'Chocolate Cake';
-// });
+bus.send<BakeCake>(BakeCake, (m: BakeCake) => {
+    m.type = 'Chocolate Cake';
+});

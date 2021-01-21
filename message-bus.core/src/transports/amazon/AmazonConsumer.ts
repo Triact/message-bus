@@ -1,17 +1,18 @@
 import { SQS } from 'aws-sdk';
 import * as interfaces from "../../interfaces";
 
-interface AmazonConsumerOptions<T> {
+interface AmazonConsumerOptions {
     sqs: SQS;
     queueUrl: string;
-    handlers: interfaces.IHandleMessages<T>[]
+    messageHandler: (msgType: interfaces.MessageType, msg: any) => void
+    //handlers: interfaces.IHandleMessages<T>[]
 }
 
-export default class AmazonConsumer<T> {
+export default class AmazonConsumer {
     //private options: AmazonConsumerOptions<T>;
-    options: AmazonConsumerOptions<T>;
+    options: AmazonConsumerOptions;
 
-    constructor(options: AmazonConsumerOptions<T>) {
+    constructor(options: AmazonConsumerOptions) {
         this.options = options;
     }
 
@@ -48,8 +49,11 @@ export default class AmazonConsumer<T> {
     private processMessage = async (message: SQS.Message): Promise<void> => {
         try {
 
-            console.log(this.options.handlers[0].handle, message);
-            await this.options.handlers[0].handle(JSON.parse(message.Body!) as T);
+            console.log(message);
+            let msgType = message.Attributes!['MessageBus.MessageType'];
+
+            await this.options.messageHandler(msgType, JSON.parse(message.Body!));
+            //await this.options.handlers[0].handle(JSON.parse(message.Body!) as T);
             await this.deleteMessage(message);
         }
         catch (err) {
