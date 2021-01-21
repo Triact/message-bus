@@ -32,10 +32,10 @@ export class Composer {
                 .awsConfig(awsConfig, process.env.AWS_ACCOUNT_ID as string);
         });                
         endpoint.routes(routing => {
-            //routing.routeToTopic<EventCreated>(EventCreated, `arn:aws:sns:${awsConfig.region}:${process.env.AWS_ACCOUNT_ID}:tijdprikker_event-created`);
-            //routing.routeToEndpoint<CreateEvent>(CreateEvent, `https://sqs.${awsConfig.region}.amazonaws.com/${process.env.AWS_ACCOUNT_ID}/tijdprikker_SlackNotifier`);            
-            routing.routeToEndpoint<CreateEvent>(CreateEvent, `https://sqs.${awsConfig.region}.amazonaws.com/${process.env.AWS_ACCOUNT_ID}/dev-simplequeue`);
-            routing.routeToEndpoint<BakeCake>(BakeCake, `https://sqs.${awsConfig.region}.amazonaws.com/${process.env.AWS_ACCOUNT_ID}/dev-simplequeue`);
+            //routing.routeToTopic<EventCreated>(EventCreated, 'tijdprikker_event-created');
+            //routing.routeToEndpoint<CreateEvent>(CreateEvent, 'tijdprikker_SlackNotifier');            
+            routing.routeToEndpoint<CreateEvent>(CreateEvent, 'dev-simplequeue');
+            routing.routeToEndpoint<BakeCake>(BakeCake, 'dev-simplequeue');
         });
         endpoint.handlers(handling => {
             handling.handleMessages<CreateEvent>(CreateEvent, EventCreator)

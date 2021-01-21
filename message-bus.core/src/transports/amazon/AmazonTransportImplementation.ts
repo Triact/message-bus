@@ -43,7 +43,7 @@ export class AmazonTransportImplementation implements interfaces.ITransportImple
     publish = <T>(msg: T, msgType: string, topic: string) => {
         this.sns.publish({
             Message: JSON.stringify(msg),
-            TopicArn: topic,
+            TopicArn: `arn:aws:sns:${this.options.awsConfig.region}:${this.options.awsAccountId}:${topic}`,
             MessageAttributes: {
                 'MessageBus.MessageType': { DataType: 'String', StringValue: msgType }
             }
@@ -59,7 +59,7 @@ export class AmazonTransportImplementation implements interfaces.ITransportImple
                 'MessageBus.MessageType': { DataType: 'String', StringValue: msgType }
             },
             MessageBody: JSON.stringify(msg),
-            QueueUrl: queue
+            QueueUrl: `https://sqs.${this.options.awsConfig.region}.amazonaws.com/${this.options.awsAccountId}/${queue}`
         } as AWS.SQS.SendMessageRequest;
         this.sqs.sendMessage(params, (error, data) => {
             if (error) console.error('Error sending message.', error);
