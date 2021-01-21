@@ -18,6 +18,8 @@ export default class Endpoint {
     private customizeCallback: (container: inversifyInterfaces.Container) => void;
 
     constructor(name: string) {
+        if (!name) throw new Error(`Argument 'name' cannot be null.`)
+        if (/\s/.test(name)) throw new Error(`Argument 'name' cannot contain spaces.`);
         this.config.endpointName = name;
     }
 

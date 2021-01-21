@@ -5,19 +5,26 @@ import * as amazonInterfaces from './interfaces';
 import AmazonConsumer from './AmazonConsumer';
 import { AmazonTransport } from './AmazonTransport';
 import { AmazonTransportOptions } from './AmazonTransportOptions';
+import EndpointConfiguration, { IProvideEndpointConfiguration } from '../../configuration/EndpointConfiguration';
 
 @injectable()
 export class AmazonTransportImplementation implements interfaces.ITransportImplementation {
     
     private options: AmazonTransportOptions;
+    private endpointConfig: IProvideEndpointConfiguration;
     private sns: AWS.SNS;
     private sqs: AWS.SQS;
     private consumer: AmazonConsumer;
 
     constructor(
-        @inject(amazonInterfaces.TYPES.AmazonTransportOptions) options: AmazonTransportOptions
+        @inject(interfaces.TYPES.IProvideEnpointConfiguration) endpointConfig: IProvideEndpointConfiguration,
+        @inject(amazonInterfaces.TYPES.AmazonTransportOptions) options: AmazonTransportOptions        
     ) {
+        if (!endpointConfig) throw new Error(`Argument 'endpointConfig' cannot be null.`);
+        if (!options) throw new Error(`Argument 'options' cannot be null.`);
+
         this.options = options;
+        this.endpointConfig = endpointConfig;
         this.sns = new AWS.SNS(options.awsConfig);
         this.sqs = new AWS.SQS(options.awsConfig);
     }
@@ -27,7 +34,7 @@ export class AmazonTransportImplementation implements interfaces.ITransportImple
 
         this.consumer = new AmazonConsumer({
             sqs: this.sqs,
-            queueUrl: `https://sqs.${this.options.awsConfig.region}.amazonaws.com/${this.options.awsAccountId}/dev-simplequeue`,
+            queueUrl: `https://sqs.${this.options.awsConfig.region}.amazonaws.com/${this.options.awsAccountId}/${this.endpointConfig.endpointName}`,
             messageHandler: messageReceivedCallback
         });
         this.consumer.start();
