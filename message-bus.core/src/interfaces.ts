@@ -20,7 +20,6 @@ export interface IRoutingConfiguration extends IProvideRoutes {
 
 export interface IHandlingConfiguration {
     handleMessages<T>(msgCtor: new (...args: any[]) => T, handlerCtor: new (...args: any[]) => IHandleMessages<T>): void;
-    //handleMessages<T>(msgCtor: new (...args: any[]) => T, handler: IHandleMessages<T>): void;
 }
 
 // Providers
@@ -48,7 +47,6 @@ export interface ITransportImplementation {
 }
 
 export interface IProvideMessageHandlers {
-    //getHandlersForMessageType<T>(msgCtor: new (...args: any[]) => T, msgType: MessageType): IHandleMessages<T>[];
     getHandlersForMessageType<T>(msgType: MessageType): IHandleMessages<T>[];
 }
 
