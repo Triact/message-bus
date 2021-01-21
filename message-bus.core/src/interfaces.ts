@@ -15,7 +15,7 @@ export const TYPES = {
 // Endpoint Configuration
 export interface IRoutingConfiguration extends IProvideRoutes {
     routeToTopic<T>(ctor: new (...args: any[]) => T, topic: string): void;
-    getDestination<T>(msg: T): { msgType: string, topic: string };
+    getDestination<T>(msg: T): { msgType: MessageType, topic: string };
 }
 
 export interface IHandlingConfiguration {
@@ -42,8 +42,8 @@ export interface ITransportConfiguration {
 }
 
 export interface ITransportImplementation {
-    publish<T>(msg: T, msgType: string, topic: string): void;
-    send<T>(msg: T, msgType: string, topic: string): void;
+    publish<T>(msg: T, msgType: string | undefined, topic: string): void;
+    send<T>(msg: T, msgType: string | undefined, topic: string): void;
     createConsumers(routesProvides: IProvideRoutes, handlerProvider: IProvideMessageHandlers): void;
     startListening(messageHandler: (msgType: MessageType, msg: any) => void): void;
 }

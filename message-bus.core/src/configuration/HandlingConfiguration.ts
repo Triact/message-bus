@@ -10,7 +10,6 @@ export default class HandlingConfiguration implements interfaces.IHandlingConfig
     constructor(container: inversifyInterfaces.Container) {
         if (!container) throw new Error(`Argument 'container' cannot be null.`)
         this.container = container;
-        this.container.bind(interfaces.TYPES.IProvideMessageHandlers).toConstantValue(this);
     }
 
     handleMessages = <T>(msgCtor: new (...args: any[]) => T, handlerCtor: new (...args: any[]) => interfaces.IHandleMessages<T>) => {
@@ -41,7 +40,7 @@ export default class HandlingConfiguration implements interfaces.IHandlingConfig
     //     this.handlers[msgType].push(handler);
     // }
 
-    getHandlersForMessageType<T>(msgType: symbol): interfaces.IHandleMessages<T>[] {
+    getHandlersForMessageType<T>(msgType: interfaces.MessageType): interfaces.IHandleMessages<T>[] {
         if (!this.container.isBound(msgType)) throw new Error(`Message handler for message '${msgType.toString()}' not found.`);
         return this.container.getAll<interfaces.IHandleMessages<T>>(msgType);
     }

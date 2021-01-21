@@ -24,7 +24,14 @@ export default class AmazonConsumer {
     private poll = (): void => {
         try {
             this.options.sqs
-                .receiveMessage({ QueueUrl: this.options.queueUrl })
+                .receiveMessage({ 
+                    QueueUrl: this.options.queueUrl,
+                    //VisibilityTimeout: 20,
+                    //WaitTimeSeconds: 10,
+                    MessageAttributeNames: [
+                        'All'
+                    ]
+                })
                 .promise()
                 .then(this.handleResponse);
 
@@ -48,12 +55,11 @@ export default class AmazonConsumer {
 
     private processMessage = async (message: SQS.Message): Promise<void> => {
         try {
-
-            console.log(message);
-            let msgType = message.Attributes!['MessageBus.MessageType'];
+            let msgTypeAttr = message.MessageAttributes!['MessageBus.MessageType'];
+            if (!msgTypeAttr || !msgTypeAttr.StringValue) throw new Error('Message type unknown.');
+            let msgType = Symbol.for(msgTypeAttr.StringValue);
 
             await this.options.messageHandler(msgType, JSON.parse(message.Body!));
-            //await this.options.handlers[0].handle(JSON.parse(message.Body!) as T);
             await this.deleteMessage(message);
         }
         catch (err) {

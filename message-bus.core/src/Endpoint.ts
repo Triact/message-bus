@@ -54,24 +54,28 @@ export default class Endpoint {
 
         this.container.bind<IProvideEndpointConfiguration>(interfaces.TYPES.IProvideEnpointConfiguration).toConstantValue(this.config);
         this.container.bind<Bus>(interfaces.TYPES.Bus).to(Bus).inSingletonScope();
+        
         this.transport.configure(this.container);
+        
+        let handling = new HandlingConfiguration(this.container);
+        this.container.bind(interfaces.TYPES.IProvideMessageHandlers).toConstantValue(handling);
 
         if (!options.sendOnly) {
-            if (this.handlersCallback) {
-                let handling = new HandlingConfiguration(this.container);
+            // register messges handlers.
+            if (this.handlersCallback) {                
                 this.handlersCallback(handling);
             }
         }
 
+        // customization
         if (this.customizeCallback) this.customizeCallback(this.container);
 
         var bus = this.container.get<Bus>(interfaces.TYPES.Bus);
 
-        //var bus = new Bus(this.config.transport, this.config.routing, this.config.handling);
-
         //if (options.sendOnly && this.config.handling.areRegistered()) 
         //    throw new Error('Registering handlers is not supported when running in SendOnly mode.');
 
+        // start listening when not send only.
         if (!options.sendOnly) {
             bus.startListening();
         }

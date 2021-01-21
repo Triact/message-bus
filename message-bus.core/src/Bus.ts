@@ -17,6 +17,7 @@ export default class Bus implements interfaces.IBus {
     ) {    
         if (!endpointConfigurationProvider) throw new Error(`Argument 'endpointConfigurationProvider' cannot be null.`);
         if (!transportImplementation) throw new Error(`Argument 'transportImplementation' cannot be null.`);
+        if (!messageHandlerProvider) throw new Error(`Argument 'messageHandlerProvider' cannot be null.`);
 
         this._endpointConfigProvider = endpointConfigurationProvider;
         this._transportImplementation = transportImplementation;
@@ -24,16 +25,8 @@ export default class Bus implements interfaces.IBus {
     }
 
     startListening = () => {
-
         console.log('Start listening...');
         this._transportImplementation.startListening(this.handleMessage);
-        
-        //this._transportImplementation.createConsumers(this._endpointConfigProvider.routing, this._endpointConfigProvider.handling);
-    }
-
-    private handleMessage = (msgType: interfaces.MessageType, msg: any) => {
-        let handlers = this._messageHandlerProvider.getHandlersForMessageType(msgType);
-        handlers.map(h => h.handle(msg));
     }
 
     publish = <T>(msgCtor: new (...args: any[]) => T, populateMessageCallback: (m:T) => void) => {
@@ -47,8 +40,9 @@ export default class Bus implements interfaces.IBus {
         populateMessageCallback(msg);
 
         const dest = this._endpointConfigProvider.routing.getDestination<T>(msg);
+        let msgType = this.getMessageTypeAsString(dest.msgType);
 
-        this._transportImplementation.publish(msg, dest.msgType.toString(), dest.topic);
+        this._transportImplementation.publish(msg, msgType, dest.topic);
     }
 
     send = <T>(msgCtor: new (...args: any[]) => T, populateMessageCallback: (m: T) => void) => {
@@ -62,7 +56,17 @@ export default class Bus implements interfaces.IBus {
         populateMessageCallback(msg);
 
         const dest = this._endpointConfigProvider.routing.getDestination<T>(msg);
+        let msgType = this.getMessageTypeAsString(dest.msgType);
 
-        this._transportImplementation.send(msg, dest.msgType.toString(), dest.topic);
+        this._transportImplementation.send(msg, msgType, dest.topic);
+    }
+
+    private handleMessage = (msgType: interfaces.MessageType, msg: any) => {
+        let handlers = this._messageHandlerProvider.getHandlersForMessageType(msgType);
+        handlers.map(h => h.handle(msg));
+    }
+
+    private getMessageTypeAsString = (msgType: interfaces.MessageType) => {
+        return typeof msgType === 'symbol' ? Symbol.keyFor(msgType) : msgType;
     }
 }

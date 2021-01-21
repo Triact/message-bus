@@ -34,11 +34,11 @@ export class Composer {
         endpoint.routes(routing => {
             //routing.routeToTopic<EventCreated>(EventCreated, `arn:aws:sns:${awsConfig.region}:${process.env.AWS_ACCOUNT_ID}:tijdprikker_event-created`);
             //routing.routeToEndpoint<CreateEvent>(CreateEvent, `https://sqs.${awsConfig.region}.amazonaws.com/${process.env.AWS_ACCOUNT_ID}/tijdprikker_SlackNotifier`);            
-            //routing.routeToEndpoint<CreateEvent>(CreateEvent, `https://sqs.${awsConfig.region}.amazonaws.com/${process.env.AWS_ACCOUNT_ID}/dev-simplequeue`);
+            routing.routeToEndpoint<CreateEvent>(CreateEvent, `https://sqs.${awsConfig.region}.amazonaws.com/${process.env.AWS_ACCOUNT_ID}/dev-simplequeue`);
             routing.routeToEndpoint<BakeCake>(BakeCake, `https://sqs.${awsConfig.region}.amazonaws.com/${process.env.AWS_ACCOUNT_ID}/dev-simplequeue`);
         });
         endpoint.handlers(handling => {
-            //handling.handleMessages<CreateEvent>(CreateEvent, new EventCreator())
+            handling.handleMessages<CreateEvent>(CreateEvent, EventCreator)
             handling.handleMessages<BakeCake>(BakeCake, Bakery);
         });
         endpoint.customize(container => {
@@ -46,5 +46,6 @@ export class Composer {
         })
 
         return endpoint.start();
+        //return endpoint.sendOnly();
     }
 }

@@ -4,7 +4,7 @@ export default class RoutingConfiguration implements interfaces.IRoutingConfigur
 
     private routes: any = {};
 
-    getDestination = <T>(msg: T): { msgType: string, topic: string } => {
+    getDestination = <T>(msg: T): { msgType: interfaces.MessageType, topic: string } => {
         const msgType = Reflect.getMetadata('MessageType', msg);
         if (!(msgType in this.routes)) throw Error(`Route for message:${msgType.toString()} not found.`);
         return {
