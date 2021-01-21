@@ -21,8 +21,12 @@ export class AmazonTransport implements interfaces.ITransport {
         container.bind(interfaces.TYPES.ITransportImplementation).to(AmazonTransportImplementation).inSingletonScope();
     }
 
-    awsConfig = (awsConfig: AWS.Config) :  AmazonTransport => {
+    awsConfig = (awsConfig: AWS.Config, awsAccountId: string) :  AmazonTransport => {
+        if (!awsConfig) throw new Error(`Argument 'awsConfig' cannot be null.`);
+        if (!awsAccountId) throw new Error(`Argument 'awsAccountId' cannot be null.`);
+
         this._options.awsConfig = awsConfig;
+        this._options.awsAccountId = awsAccountId;
         return this;
     }
 

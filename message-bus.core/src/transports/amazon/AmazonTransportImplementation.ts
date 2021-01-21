@@ -9,37 +9,28 @@ import { AmazonTransportOptions } from './AmazonTransportOptions';
 @injectable()
 export class AmazonTransportImplementation implements interfaces.ITransportImplementation {
     
+    private options: AmazonTransportOptions;
     private sns: AWS.SNS;
     private sqs: AWS.SQS;
-    private consumers: any[] = [];
+    private consumer: AmazonConsumer;
 
     constructor(
         @inject(amazonInterfaces.TYPES.AmazonTransportOptions) options: AmazonTransportOptions
     ) {
+        this.options = options;
         this.sns = new AWS.SNS(options.awsConfig);
         this.sqs = new AWS.SQS(options.awsConfig);
     }
     
-    createConsumers(routesProvides: interfaces.IProvideRoutes, handlerProvider: interfaces.IProvideMessageHandlers): void {
-        var routes = routesProvides.getRoutes()
+    startListening = (messageReceivedCallback: (msgType: interfaces.MessageType, msg: any) => void) => {
+        if (this.consumer) throw new Error('Already started');
 
-        console.log("### creating consumers")
-        routes.forEach((r) => {
-            console.log(r);
-
-            let consumer = new AmazonConsumer({
-                sqs: this.sqs,
-                queueUrl: r.topic,
-                handlers: handlerProvider.getHandlersForMessageType(r.msgCtor, r.msgType)
-            });
-
-            console.log('### HANDLER', consumer.options.handlers)
-            consumer.options.handlers[0].handle({});
-
-            consumer.start();
-
-            this.consumers.push(consumer);
+        this.consumer = new AmazonConsumer({
+            sqs: this.sqs,
+            queueUrl: `https://sqs.${this.options.awsConfig.region}.amazonaws.com/${this.options.awsAccountId}/dev-simplequeue`,
+            messageHandler: messageReceivedCallback
         });
+        this.consumer.start();
     }
 
     publish = <T>(msg: T, msgType: string, topic: string) => {
@@ -58,10 +49,7 @@ export class AmazonTransportImplementation implements interfaces.ITransportImple
         let params = {
             DelaySeconds: 0,
             MessageAttributes: {
-                "MessageBus.MessageType": {
-                    DataType: "String",
-                    StringValue: msgType
-                }
+                'MessageBus.MessageType': { DataType: 'String', StringValue: msgType }
             },
             MessageBody: JSON.stringify(msg),
             QueueUrl: queue

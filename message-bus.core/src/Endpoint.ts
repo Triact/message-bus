@@ -14,12 +14,14 @@ export default class Endpoint {
     private container: inversifyInterfaces.Container;
     private config = new EndpointConfiguration();
     private transport: interfaces.ITransport;
+    private handlersCallback: (handling: interfaces.IHandlingConfiguration) => void;
+    private customizeCallback: (container: inversifyInterfaces.Container) => void;
 
     constructor(name: string) {
         this.config.endpointName = name;
     }
 
-    useExistingContainer = (container: Container) => {
+    useExistingContainer = (container: inversifyInterfaces.Container) => {
         if (!container) throw new Error(`Argument 'container' cannot be null.`);
         this.container = container;
     }
@@ -37,6 +39,15 @@ export default class Endpoint {
         callback(this.config.routing);
     }
 
+    customize = (callback: (container: inversifyInterfaces.Container) => void) => {
+        this.customizeCallback = callback;
+    }
+
+    handlers = (callback: (handling: interfaces.IHandlingConfiguration) => void) => {
+        if (!callback) throw new Error(`Argument 'callback' cannot be null.`);
+        this.handlersCallback = callback;
+    }
+
     start = (options: StartOptions = {}): interfaces.IBus => {
         console.log("Starting endpoint...")
         if (!this.container) this.container = new Container();
@@ -45,26 +56,33 @@ export default class Endpoint {
         this.container.bind<Bus>(interfaces.TYPES.Bus).to(Bus).inSingletonScope();
         
         this.transport.configure(this.container);
+        
+        let handling = new HandlingConfiguration(this.container);
+        this.container.bind(interfaces.TYPES.IProvideMessageHandlers).toConstantValue(handling);
+
+        if (!options.sendOnly) {
+            // register messges handlers.
+            if (this.handlersCallback) {                
+                this.handlersCallback(handling);
+            }
+        }
+
+        // customization
+        if (this.customizeCallback) this.customizeCallback(this.container);
 
         var bus = this.container.get<Bus>(interfaces.TYPES.Bus);
 
-        //var bus = new Bus(this.config.transport, this.config.routing, this.config.handling);
+        //if (options.sendOnly && this.config.handling.areRegistered()) 
+        //    throw new Error('Registering handlers is not supported when running in SendOnly mode.');
 
-        if (options.sendOnly && this.config.handling.areRegistered()) 
-            throw new Error('Registering handlers is not supported when running in SendOnly mode.');
-
+        // start listening when not send only.
         if (!options.sendOnly) {
             bus.startListening();
         }
 
         console.log('Endpoint started.');
         return bus;
-    }
-
-    handlers = (callback: (handling: interfaces.IHandlingConfiguration) => void) => {
-        if (!callback) throw new Error(`Argument 'callback' cannot be null.`);
-        callback(this.config.handling);
-    }
+    }   
 
     sendOnly = (): interfaces.IBus => {
         return this.start({sendOnly: true});
