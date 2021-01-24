@@ -30,7 +30,7 @@ export class Composer {
         endpoint.useTransport<AmazonTransport>(AmazonTransport, transport => {
             transport
                 .awsConfig(awsConfig, process.env.AWS_ACCOUNT_ID as string);
-        });                
+        });
         endpoint.routes(routing => {
             //routing.routeToTopic<EventCreated>(EventCreated, 'tijdprikker_event-created');
             //routing.routeToEndpoint<CreateEvent>(CreateEvent, 'tijdprikker_SlackNotifier');            
@@ -45,7 +45,7 @@ export class Composer {
             container.bind(Symbol.for('NotificationService')).to(NotificationService);
         })
 
-        return endpoint.start();
-        //return endpoint.sendOnly();
+        //return endpoint.start();
+        return endpoint.sendOnly();
     }
 }
