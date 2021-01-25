@@ -6,4 +6,4 @@ export { event, command } from './decorators/messageDecorators';
 
 // Transports
 export { AmazonTransport as AmazonTransport } from './transports/amazon/AmazonTransport';
-export { FakeTransport } from './transports/FakeTransport';
+export { FakeTransport } from './transports/fake/FakeTransport';

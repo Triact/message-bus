@@ -10,7 +10,8 @@ export const TYPES = {
     ITransport: Symbol.for('ITransport'),
     ITransportImplementation: Symbol.for('ITransportImplementation'),
     MessageHandler: Symbol.for('MessageHandler'),
-    IProvideMessageHandlers: Symbol.for('IProvideMessageHandlers')
+    IProvideMessageHandlers: Symbol.for('IProvideMessageHandlers'),
+    ILogger: Symbol.for('ILogger')
 }
 
 // Endpoint Configuration
@@ -49,7 +50,7 @@ export interface ITransportConfiguration {
 
 export interface ITransportImplementation {
     publish<T>(msg: T, msgType: string | undefined, topic: string): void;
-    send<T>(msg: T, msgType: string | undefined, topic: string): void;
+    send<T>(msg: T, msgType: string | undefined, queue: string): void;
     startListening(messageHandler: (msgType: MessageType, msg: any, context: IMessageContext) => void, createMessageContextCallback: () => MessageContext): void;
 }
 
@@ -78,4 +79,12 @@ export class MessagePurposes {
 export class MessageMetadataKeys {
     static readonly MessagePurpose: string = 'MessagePurpose';
     static readonly MessageType: string = 'MessageType';
+}
+
+export interface ILogger {
+    debug(text:string, ...data:any[]) : void;
+    info(text:string, ...data:any[]) : void;
+    warning(text:string, ...data:any[]) : void;
+    error(text:string, ...data:any[]) : void;
+    fatal(text:string, ...data:any[]) : void;
 }

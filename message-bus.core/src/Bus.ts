@@ -10,11 +10,13 @@ export default class Bus implements interfaces.IBus {
     private _endpointConfigProvider: IProvideEndpointConfiguration;
     private _transportImplementation: interfaces.ITransportImplementation;
     private _messageHandlerProvider: interfaces.IProvideMessageHandlers;
+    private _logger: interfaces.ILogger;
 
     constructor(
         @inject(interfaces.TYPES.IProvideEnpointConfiguration) endpointConfigurationProvider: IProvideEndpointConfiguration,
         @inject(interfaces.TYPES.ITransportImplementation) transportImplementation: interfaces.ITransportImplementation,
-        @inject(interfaces.TYPES.IProvideMessageHandlers) messageHandlerProvider: interfaces.IProvideMessageHandlers
+        @inject(interfaces.TYPES.IProvideMessageHandlers) messageHandlerProvider: interfaces.IProvideMessageHandlers,
+        @inject(interfaces.TYPES.ILogger) logger: interfaces.ILogger
     ) {    
         if (!endpointConfigurationProvider) throw new Error(`Argument 'endpointConfigurationProvider' cannot be null.`);
         if (!transportImplementation) throw new Error(`Argument 'transportImplementation' cannot be null.`);
@@ -23,10 +25,11 @@ export default class Bus implements interfaces.IBus {
         this._endpointConfigProvider = endpointConfigurationProvider;
         this._transportImplementation = transportImplementation;
         this._messageHandlerProvider = messageHandlerProvider;
+        this._logger = logger;
     }
 
     startListening = () => {
-        console.log('Start listening...');
+        this._logger.info('Bus start listening...');
         this._transportImplementation.startListening(this.handleMessage, this.createMessageContext);
     }
 
