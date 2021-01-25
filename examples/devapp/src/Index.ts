@@ -3,9 +3,7 @@ import { Container } from 'inversify';
 import { interfaces } from 'message-bus.core';
 import { Composer } from './config/Composer';
 import { TYPES } from "./config/Types";
-import BakeCake from './messages/BakeCake';
-import CreateEvent from './messages/CreateEvent';
-
+import * as messages from './messages/messages';
 
 console.log("Starting...");
 
@@ -26,11 +24,11 @@ const bus = composer.compose();
 //     m.eventId = 'blabla'; 
 // });
 
-bus.send<CreateEvent>(CreateEvent, (m: CreateEvent) => {
-    m.eventId = '1';
-    m.name = 'Test event';
-});
+// bus.send<CreateEvent>(CreateEvent, (m: CreateEvent) => {
+//     m.eventId = '1';
+//     m.name = 'Test event';
+// });
 
-bus.send<BakeCake>(BakeCake, (m: BakeCake) => {
+bus.send<messages.commands.BakeCake>(messages.commands.BakeCake, (m: messages.commands.BakeCake) => {
     m.type = 'Chocolate Cake';
 });

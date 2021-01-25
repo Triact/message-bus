@@ -1,4 +1,5 @@
 import { interfaces as inversifyInterfaces } from 'inversify';
+import MessageContext from './MessageContext';
 
 export type MessageType = (string | symbol);
 export type RouteDefinition<T> = { msgType: MessageType, topic: string, msgCtor: new (...args: any[]) => T };
@@ -28,9 +29,15 @@ export interface IProvideRoutes {
 }
 
 // Bus
-export interface IBus {
-    publish<T>(ctor: new (...args: any[]) => T, populateMessageCallback: (m: T) => void): void;
-    send<T>(ctor: new (...args: any[]) => T, populateMessageCallback: (m: T) => void): void;
+interface ISendMessages {
+    send<T>(msgCtor: new (...args: any[]) => T, populateMessageCallback: (m: T) => void): void;
+} 
+
+interface IPublishMessages {
+    publish<T>(msgCtor: new (...args: any[]) => T, populateMessageCallback: (m: T) => void): void;
+}
+
+export interface IBus extends ISendMessages, IPublishMessages {    
 }
 
 export interface ITransport {
@@ -43,7 +50,7 @@ export interface ITransportConfiguration {
 export interface ITransportImplementation {
     publish<T>(msg: T, msgType: string | undefined, topic: string): void;
     send<T>(msg: T, msgType: string | undefined, topic: string): void;
-    startListening(messageHandler: (msgType: MessageType, msg: any) => void): void;
+    startListening(messageHandler: (msgType: MessageType, msg: any, context: IMessageContext) => void, createMessageContextCallback: () => MessageContext): void;
 }
 
 export interface IProvideMessageHandlers {
@@ -51,11 +58,16 @@ export interface IProvideMessageHandlers {
 }
 
 export interface IHandleMessages<T> {
-    handle(msg: T): Promise<void>;
+    handle(msg: T, context: IMessageContext): Promise<void>;
 }
 
-export interface IMessage {
+export interface IMessageContext extends ISendMessages, IPublishMessages {
+    messageHeaders: MessageHeaderMap
+}
 
+export type MessageHeaderMap = {[key: string]: string};
+
+export interface IMessage {
 }
 
 export class MessagePurposes {

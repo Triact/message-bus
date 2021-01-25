@@ -1,11 +1,11 @@
-import { inject, injectable } from 'inversify';
+import { inject, injectable, interfaces as inversifyInterfaces } from 'inversify';
 import { IHandleMessages } from 'message-bus.core/dist/interfaces';
-import BakeCake from '../messages/BakeCake';
 import NotificationService from '../services/NotificationService';
-//import BakeCake from '../messages/BakeCake';
+import { interfaces } from 'message-bus.core';
+import * as messages from '../messages/messages';
 
 @injectable()
-export default class Bakery implements IHandleMessages<BakeCake> {
+export default class Bakery implements IHandleMessages<messages.commands.BakeCake> {
     
     private notificationService: NotificationService;
 
@@ -16,7 +16,12 @@ export default class Bakery implements IHandleMessages<BakeCake> {
         this.notificationService = notificationService;
     }
 
-    handle = async (msg: BakeCake) => {
+    handle = async (msg: messages.commands.BakeCake, context: interfaces.IMessageContext) => {
         this.notificationService.notify(`Baking cake ${msg.type}`);
+        console.log('Messageheaders:', context.messageHeaders);
+
+        context.publish<messages.events.CakeBaked>(messages.events.CakeBaked, m => {
+            m.type = msg.type;
+        });
     }
 }

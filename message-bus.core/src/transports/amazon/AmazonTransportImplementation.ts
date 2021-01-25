@@ -6,6 +6,7 @@ import AmazonConsumer from './AmazonConsumer';
 import { AmazonTransport } from './AmazonTransport';
 import { AmazonTransportOptions } from './AmazonTransportOptions';
 import EndpointConfiguration, { IProvideEndpointConfiguration } from '../../configuration/EndpointConfiguration';
+import MessageContext from '../../MessageContext';
 
 @injectable()
 export class AmazonTransportImplementation implements interfaces.ITransportImplementation {
@@ -29,13 +30,17 @@ export class AmazonTransportImplementation implements interfaces.ITransportImple
         this.sqs = new AWS.SQS(options.awsConfig);
     }
     
-    startListening = (messageReceivedCallback: (msgType: interfaces.MessageType, msg: any) => void) => {
+    startListening = (
+        messageReceivedCallback: (msgType: interfaces.MessageType, msg: any, context: interfaces.IMessageContext) => void,
+        createMessageContextCallbak: () => MessageContext
+    ) => {
         if (this.consumer) throw new Error('Already started');
 
         this.consumer = new AmazonConsumer({
             sqs: this.sqs,
             queueUrl: `https://sqs.${this.options.awsConfig.region}.amazonaws.com/${this.options.awsAccountId}/${this.endpointConfig.endpointName}`,
-            messageHandler: messageReceivedCallback
+            messageHandler: messageReceivedCallback,
+            createMessageContextCallback: createMessageContextCallbak
         });
         this.consumer.start();
     }
@@ -45,7 +50,8 @@ export class AmazonTransportImplementation implements interfaces.ITransportImple
             Message: JSON.stringify(msg),
             TopicArn: `arn:aws:sns:${this.options.awsConfig.region}:${this.options.awsAccountId}:${topic}`,
             MessageAttributes: {
-                'MessageBus.MessageType': { DataType: 'String', StringValue: msgType }
+                'MessageBus.MessageType': { DataType: 'String', StringValue: msgType },
+                'MessageBus.TimeSent': { DataType: 'String', StringValue: new Date().toISOString()}
             }
         }, (error: AWS.AWSError, data: AWS.SNS.PublishResponse) => {
             if (error) console.error("Error publishing message.", error);
@@ -56,7 +62,8 @@ export class AmazonTransportImplementation implements interfaces.ITransportImple
         let params = {
             DelaySeconds: 0,
             MessageAttributes: {
-                'MessageBus.MessageType': { DataType: 'String', StringValue: msgType }
+                'MessageBus.MessageType': { DataType: 'String', StringValue: msgType },
+                'MessageBus.TimeSent': { DataType: 'String', StringValue: new Date().toISOString()}
             },
             MessageBody: JSON.stringify(msg),
             QueueUrl: `https://sqs.${this.options.awsConfig.region}.amazonaws.com/${this.options.awsAccountId}/${queue}`

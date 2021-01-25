@@ -1,11 +1,12 @@
 import { SQS } from 'aws-sdk';
 import * as interfaces from "../../interfaces";
+import MessageContext from '../../MessageContext';
 
 interface AmazonConsumerOptions {
     sqs: SQS;
     queueUrl: string;
-    messageHandler: (msgType: interfaces.MessageType, msg: any) => void
-    //handlers: interfaces.IHandleMessages<T>[]
+    messageHandler: (msgType: interfaces.MessageType, msg: any, context: interfaces.IMessageContext) => void,
+    createMessageContextCallback: () => MessageContext
 }
 
 export default class AmazonConsumer {
@@ -58,8 +59,15 @@ export default class AmazonConsumer {
             let msgTypeAttr = message.MessageAttributes!['MessageBus.MessageType'];
             if (!msgTypeAttr || !msgTypeAttr.StringValue) throw new Error('Message type unknown.');
             let msgType = Symbol.for(msgTypeAttr.StringValue);
+            let context = this.options.createMessageContextCallback();
+            
+            for (let key in message.MessageAttributes) {
+                let value = message.MessageAttributes[key];
+                if (value.StringValue)
+                    context.addHeader(key, value.StringValue);
+            }            
 
-            await this.options.messageHandler(msgType, JSON.parse(message.Body!));
+            await this.options.messageHandler(msgType, JSON.parse(message.Body!), context);
             await this.deleteMessage(message);
         }
         catch (err) {
