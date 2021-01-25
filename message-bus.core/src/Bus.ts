@@ -2,6 +2,7 @@ import { inject, injectable } from "inversify";
 import { IProvideEndpointConfiguration } from "./configuration/EndpointConfiguration";
 import { MessageHelper } from "./helpers/MessageHelper";
 import * as interfaces from './interfaces';
+import MessageContext from "./MessageContext";
 
 @injectable()
 export default class Bus implements interfaces.IBus {
@@ -26,7 +27,7 @@ export default class Bus implements interfaces.IBus {
 
     startListening = () => {
         console.log('Start listening...');
-        this._transportImplementation.startListening(this.handleMessage);
+        this._transportImplementation.startListening(this.handleMessage, this.createMessageContext);
     }
 
     publish = <T>(msgCtor: new (...args: any[]) => T, populateMessageCallback: (m:T) => void) => {
@@ -61,9 +62,13 @@ export default class Bus implements interfaces.IBus {
         this._transportImplementation.send(msg, msgType, dest.topic);
     }
 
-    private handleMessage = (msgType: interfaces.MessageType, msg: any) => {
-        let handlers = this._messageHandlerProvider.getHandlersForMessageType(msgType);
-        handlers.map(h => h.handle(msg));
+    private handleMessage = (msgType: interfaces.MessageType, msg: any, context: MessageContext) => {
+        let handlers = this._messageHandlerProvider.getHandlersForMessageType(msgType);        
+        handlers.map(h => h.handle(msg, context));
+    }
+
+    private createMessageContext = () : MessageContext => {
+        return new MessageContext(this);
     }
 
     private getMessageTypeAsString = (msgType: interfaces.MessageType) => {

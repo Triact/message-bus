@@ -3,9 +3,8 @@ import { Container } from "inversify";
 import { Endpoint, FakeTransport, AmazonTransport, interfaces } from 'message-bus.core';
 import Bakery from '../handlers/Bakery';
 import EventCreator from '../handlers/EventCreator';
-import BakeCake from '../messages/BakeCake';
-import CreateEvent from '../messages/CreateEvent';
 import NotificationService from '../services/NotificationService';
+import * as messages from '../messages/messages';
 import { TYPES } from "./types";
 
 export class Composer {
@@ -34,18 +33,19 @@ export class Composer {
         endpoint.routes(routing => {
             //routing.routeToTopic<EventCreated>(EventCreated, 'tijdprikker_event-created');
             //routing.routeToEndpoint<CreateEvent>(CreateEvent, 'tijdprikker_SlackNotifier');            
-            routing.routeToEndpoint<CreateEvent>(CreateEvent, 'dev-simplequeue');
-            routing.routeToEndpoint<BakeCake>(BakeCake, 'dev-simplequeue');
+            routing.routeToEndpoint<messages.commands.CreateEvent>(messages.commands.CreateEvent, 'dev-simplequeue');
+            routing.routeToEndpoint<messages.commands.BakeCake>(messages.commands.BakeCake, 'dev-simplequeue');
+            routing.routeToTopic<messages.events.CakeBaked>(messages.events.CakeBaked, 'dev-CakeBaked')
         });
         endpoint.handlers(handling => {
-            handling.handleMessages<CreateEvent>(CreateEvent, EventCreator)
-            handling.handleMessages<BakeCake>(BakeCake, Bakery);
+            handling.handleMessages<messages.commands.CreateEvent>(messages.commands.CreateEvent, EventCreator)
+            handling.handleMessages<messages.commands.BakeCake>(messages.commands.BakeCake, Bakery);
         });
         endpoint.customize(container => {
             container.bind(Symbol.for('NotificationService')).to(NotificationService);
         })
 
-        //return endpoint.start();
-        return endpoint.sendOnly();
+        return endpoint.start();
+        //return endpoint.sendOnly();
     }
 }
