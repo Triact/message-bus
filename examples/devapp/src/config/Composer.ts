@@ -26,9 +26,12 @@ export class Composer {
 
         const endpoint = new Endpoint('dev-simplequeue');
         endpoint.useExistingContainer(this.container);
-        endpoint.useTransport<AmazonTransport>(AmazonTransport, transport => {
-            transport
-                .awsConfig(awsConfig, process.env.AWS_ACCOUNT_ID as string);
+        // endpoint.useTransport<AmazonTransport>(AmazonTransport, transport => {
+        //     transport
+        //         .awsConfig(awsConfig, process.env.AWS_ACCOUNT_ID as string);
+        // });
+        endpoint.useTransport<FakeTransport>(FakeTransport, transport => {
+
         });
         endpoint.routes(routing => {
             //routing.routeToTopic<EventCreated>(EventCreated, 'tijdprikker_event-created');

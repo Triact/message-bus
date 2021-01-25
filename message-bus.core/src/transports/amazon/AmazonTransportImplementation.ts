@@ -16,18 +16,22 @@ export class AmazonTransportImplementation implements interfaces.ITransportImple
     private sns: AWS.SNS;
     private sqs: AWS.SQS;
     private consumer: AmazonConsumer;
+    private logger: interfaces.ILogger;
 
     constructor(
         @inject(interfaces.TYPES.IProvideEnpointConfiguration) endpointConfig: IProvideEndpointConfiguration,
-        @inject(amazonInterfaces.TYPES.AmazonTransportOptions) options: AmazonTransportOptions        
+        @inject(amazonInterfaces.TYPES.AmazonTransportOptions) options: AmazonTransportOptions,
+        @inject(interfaces.TYPES.ILogger) logger: interfaces.ILogger        
     ) {
         if (!endpointConfig) throw new Error(`Argument 'endpointConfig' cannot be null.`);
         if (!options) throw new Error(`Argument 'options' cannot be null.`);
+        if (!logger) throw new Error(`Argument 'logger' cannot be null.`);
 
         this.options = options;
         this.endpointConfig = endpointConfig;
         this.sns = new AWS.SNS(options.awsConfig);
         this.sqs = new AWS.SQS(options.awsConfig);
+        this.logger = logger;
     }
     
     startListening = (
@@ -40,7 +44,8 @@ export class AmazonTransportImplementation implements interfaces.ITransportImple
             sqs: this.sqs,
             queueUrl: `https://sqs.${this.options.awsConfig.region}.amazonaws.com/${this.options.awsAccountId}/${this.endpointConfig.endpointName}`,
             messageHandler: messageReceivedCallback,
-            createMessageContextCallback: createMessageContextCallbak
+            createMessageContextCallback: createMessageContextCallbak,
+            logger: this.logger
         });
         this.consumer.start();
     }
@@ -54,7 +59,7 @@ export class AmazonTransportImplementation implements interfaces.ITransportImple
                 'MessageBus.TimeSent': { DataType: 'String', StringValue: new Date().toISOString()}
             }
         }, (error: AWS.AWSError, data: AWS.SNS.PublishResponse) => {
-            if (error) console.error("Error publishing message.", error);
+            if (error) this.logger.error("Error publishing message to SNS topic.", error);
         });
     }
 
@@ -69,7 +74,7 @@ export class AmazonTransportImplementation implements interfaces.ITransportImple
             QueueUrl: `https://sqs.${this.options.awsConfig.region}.amazonaws.com/${this.options.awsAccountId}/${queue}`
         } as AWS.SQS.SendMessageRequest;
         this.sqs.sendMessage(params, (error, data) => {
-            if (error) console.error('Error sending message.', error);
+            if (error) this.logger.error('Error sending message to SQS queue.', error);
         });
     }
 }

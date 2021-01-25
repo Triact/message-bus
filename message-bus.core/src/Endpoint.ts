@@ -4,6 +4,7 @@ import EndpointConfiguration, { IProvideEndpointConfiguration } from './configur
 import HandlingConfiguration from './configuration/HandlingConfiguration';
 import RoutingConfiguration from './configuration/RoutingConfiguration';
 import * as interfaces from './interfaces';
+import { ConsoleLogger } from './loggers/ConsoleLogger';
 
 interface StartOptions {
     sendOnly?: boolean;
@@ -14,6 +15,7 @@ export default class Endpoint {
     private container: inversifyInterfaces.Container;
     private config = new EndpointConfiguration();
     private transport: interfaces.ITransport;
+    private loggerCtor: new (...args: any[]) => interfaces.ILogger;
     private handlersCallback: (handling: interfaces.IHandlingConfiguration) => void;
     private customizeCallback: (container: inversifyInterfaces.Container) => void;
 
@@ -36,6 +38,11 @@ export default class Endpoint {
         this.transport = transport;        
     }
 
+    useLogger = <T extends interfaces.ILogger>(ctor: new (...args: any[]) => T) => {
+        if (!ctor) throw new Error(`Argument 'ctor' cannot be null.`);
+        this.loggerCtor = ctor;
+    }
+
     routes = (callback: (routing: RoutingConfiguration) => void) => {
         if (!callback) throw Error(`Argument 'callback' cannot be null.`);
         callback(this.config.routing);
@@ -51,11 +58,14 @@ export default class Endpoint {
     }
 
     start = (options: StartOptions = {}): interfaces.IBus => {
-        console.log("Starting endpoint...")
+        // Defaults
         if (!this.container) this.container = new Container();
+        if (!this.loggerCtor) this.loggerCtor = ConsoleLogger;
+        // End defaults
 
         this.container.bind<IProvideEndpointConfiguration>(interfaces.TYPES.IProvideEnpointConfiguration).toConstantValue(this.config);
         this.container.bind<Bus>(interfaces.TYPES.Bus).to(Bus).inSingletonScope();
+        this.container.bind<interfaces.ILogger>(interfaces.TYPES.ILogger).to(this.loggerCtor).inSingletonScope();
         
         this.transport.configure(this.container);
         
@@ -72,6 +82,9 @@ export default class Endpoint {
         // customization
         if (this.customizeCallback) this.customizeCallback(this.container);
 
+        var logger = this.container.get<interfaces.ILogger>(interfaces.TYPES.ILogger);
+        logger.info('Starting endpoint...');
+
         var bus = this.container.get<Bus>(interfaces.TYPES.Bus);
 
         //if (options.sendOnly && this.config.handling.areRegistered()) 
@@ -82,7 +95,7 @@ export default class Endpoint {
             bus.startListening();
         }
 
-        console.log('Endpoint started.');
+        logger.info('Endpoint started.');
         return bus;
     }   
 

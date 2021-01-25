@@ -6,11 +6,11 @@ interface AmazonConsumerOptions {
     sqs: SQS;
     queueUrl: string;
     messageHandler: (msgType: interfaces.MessageType, msg: any, context: interfaces.IMessageContext) => void,
-    createMessageContextCallback: () => MessageContext
+    createMessageContextCallback: () => MessageContext,
+    logger: interfaces.ILogger
 }
 
 export default class AmazonConsumer {
-    //private options: AmazonConsumerOptions<T>;
     options: AmazonConsumerOptions;
 
     constructor(options: AmazonConsumerOptions) {
@@ -18,7 +18,6 @@ export default class AmazonConsumer {
     }
 
     public start = async () => {
-        //console.log("### starting consumer", this.options)
         this.poll();
     }
 
@@ -38,7 +37,7 @@ export default class AmazonConsumer {
 
             setTimeout(this.poll, 1000);
         } catch (err) {
-            console.error('pollerr', err);
+            this.options.logger.error('Error polling message from SQS', err);
         } finally {
             //setTimeout(this.poll, 1000);
         }
@@ -71,7 +70,7 @@ export default class AmazonConsumer {
             await this.deleteMessage(message);
         }
         catch (err) {
-            console.error('processMessage', err);
+            this.options.logger.error('Error processing message:', err);
         }
     }
 
@@ -87,7 +86,7 @@ export default class AmazonConsumer {
                 .deleteMessage(deleteParams)
                 .promise();
         } catch (err) {
-            console.error('deleteMessage', err);
+            this.options.logger.error('Error deleting message from SQS:', err);
         }
     }
 
