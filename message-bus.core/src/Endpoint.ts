@@ -3,6 +3,7 @@ import Bus from './Bus';
 import EndpointConfiguration, { IProvideEndpointConfiguration } from './configuration/EndpointConfiguration'
 import HandlingConfiguration from './configuration/HandlingConfiguration';
 import RoutingConfiguration from './configuration/RoutingConfiguration';
+import { FakeTransport } from './Index';
 import * as interfaces from './interfaces';
 import { ConsoleLogger } from './loggers/ConsoleLogger';
 
@@ -12,12 +13,12 @@ interface StartOptions {
 
 export default class Endpoint {
 
-    private container: inversifyInterfaces.Container;
+    private container: inversifyInterfaces.Container | undefined;
     private config = new EndpointConfiguration();
-    private transport: interfaces.ITransport;
-    private loggerCtor: new (...args: any[]) => interfaces.ILogger;
-    private handlersCallback: (handling: interfaces.IHandlingConfiguration) => void;
-    private customizeCallback: (container: inversifyInterfaces.Container) => void;
+    private transport: interfaces.ITransport | undefined;
+    private loggerCtor: (new (...args: any[]) => interfaces.ILogger) | undefined;
+    private handlersCallback: ((handling: interfaces.IHandlingConfiguration) => void) | undefined;
+    private customizeCallback: ((container: inversifyInterfaces.Container) => void) | undefined;
 
     constructor(name: string) {
         if (!name) throw new Error(`Argument 'name' cannot be null.`)
@@ -61,6 +62,7 @@ export default class Endpoint {
         // Defaults
         if (!this.container) this.container = new Container();
         if (!this.loggerCtor) this.loggerCtor = ConsoleLogger;
+        if (!this.transport) this.transport = new FakeTransport();
         // End defaults
 
         this.container.bind<IProvideEndpointConfiguration>(interfaces.TYPES.IProvideEnpointConfiguration).toConstantValue(this.config);

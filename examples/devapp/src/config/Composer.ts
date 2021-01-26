@@ -18,7 +18,7 @@ export class Composer {
     compose = () : interfaces.IBus => {
         // AWS configuration
         const awsCredentials = new AWS.SharedIniFileCredentials({ profile: process.env.AWS_PROFILE });
-        const awsConfig = new AWS.Config();
+        rconst awsConfig = new AWS.Config();
         awsConfig.update({
             credentials: awsCredentials,
             region: process.env.AWS_REGION
@@ -30,7 +30,7 @@ export class Composer {
         //     transport
         //         .awsConfig(awsConfig, process.env.AWS_ACCOUNT_ID as string);
         // });
-        endpoint.useTransport<FakeTransport>(FakeTransport, transport => {
+        endpoint.useTransport<FakeTansport>(FakeTransport, transport => {
 
         });
         endpoint.routes(routing => {

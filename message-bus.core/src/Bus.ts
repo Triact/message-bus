@@ -65,7 +65,7 @@ export default class Bus implements interfaces.IBus {
         this._transportImplementation.send(msg, msgType, dest.topic);
     }
 
-    private handleMessage = (msgType: interfaces.MessageType, msg: any, context: MessageContext) => {
+    private handleMessage = (msgType: interfaces.MessageType, msg: any, context: interfaces.IMessageContext) => {
         let handlers = this._messageHandlerProvider.getHandlersForMessageType(msgType);        
         handlers.map(h => h.handle(msg, context));
     }
