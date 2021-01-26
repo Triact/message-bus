@@ -4,14 +4,14 @@ import RoutingConfiguration from "./RoutingConfiguration";
 import * as interfaces from '../interfaces'
 
 export interface IProvideEndpointConfiguration {
-    endpointName: string;
+    endpointName: string | undefined;
     routing: RoutingConfiguration;
-    transport: interfaces.ITransportImplementation;
+    transport: interfaces.ITransportImplementation | undefined;
 }
 
 @injectable()
 export default class EndpointConfiguration implements IProvideEndpointConfiguration {
-    endpointName: string;
+    endpointName: string | undefined;
     routing = new RoutingConfiguration();
-    transport: interfaces.ITransportImplementation;
+    transport: interfaces.ITransportImplementation | undefined;
 }

@@ -5,4 +5,5 @@
 /**/*.suo
 /**/package-lock.json
 /**/dist
+/**/lib
 /**/.env.*

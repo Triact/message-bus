@@ -15,7 +15,7 @@ export class AmazonTransportImplementation implements interfaces.ITransportImple
     private endpointConfig: IProvideEndpointConfiguration;
     private sns: AWS.SNS;
     private sqs: AWS.SQS;
-    private consumer: AmazonConsumer;
+    private consumer: AmazonConsumer | undefined;
     private logger: interfaces.ILogger;
 
     constructor(

@@ -2,7 +2,7 @@ import { inject } from 'inversify';
 import * as interfaces from './interfaces';
 import Bus from './Bus';
 
-export default class MessageConext implements interfaces.IMessageContext {
+export default class MessageContext implements interfaces.IMessageContext {
 
     private bus: Bus;
 
