@@ -75,6 +75,8 @@ endpoint.useTransport<AmazonTransport>(AmazonTransport, transport => {
     transport.awsConfig(awsConfig, awsAccountId);
 });
 ```
+#### Creating a custom transport
+Docs coming soon
 
 ### Creating Messages
 Docs coming soon
