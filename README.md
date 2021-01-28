@@ -14,7 +14,7 @@ npm install @triact/message-bus.core
 ## Documentation
 [Endpoint](/docs/endpoint.md)
 
-[Transports](/docs/transports.md)
+[Transports](/docs/transport.md)
 
 [Messages](/docs/messages.md)
 
