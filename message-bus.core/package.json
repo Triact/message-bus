@@ -4,14 +4,14 @@
   "description": "",
   "author": "triact",
   "main": "./lib/csj/index.js",
-  "module":"./lib/esm/index.js",
+  "module": "./lib/esm/index.js",
   "repository": {
     "url": "git@github.com:Triact/message-bus.git"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "clean": "IF exist lib (rmdir /q /s lib) && mkdir lib",
-    "dev": "tsc -w",
+    "dev": "tsc -p tsconfig.json -w",
     "build": "tsc -p tsconfig.json && tsc -p tsconfig-csj.json",
     "prepublish": "npm run clean && npm run build",
     "refreshVSToken": "vsts-npm-auth -C .npmrc -T .npmrc"

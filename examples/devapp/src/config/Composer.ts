@@ -26,19 +26,19 @@ export class Composer {
 
         const endpoint = new Endpoint('dev-simplequeue');
         endpoint.useExistingContainer(this.container);
-        // endpoint.useTransport<AmazonTransport>(AmazonTransport, transport => {
-        //     transport
-        //         .awsConfig(awsConfig, process.env.AWS_ACCOUNT_ID as string);
-        // });
+        endpoint.useTransport<AmazonTransport>(AmazonTransport, transport => {
+            transport
+                .awsConfig(awsConfig, process.env.AWS_ACCOUNT_ID as string);
+        });
         endpoint.useTransport<FakeTransport>(FakeTransport, transport => {
-
+            
         });
         endpoint.routes(routing => {
             //routing.routeToTopic<EventCreated>(EventCreated, 'tijdprikker_event-created');
-            //routing.routeToEndpoint<CreateEvent>(CreateEvent, 'tijdprikker_SlackNotifier');            
+            //routing.routeToEndpoint<CreateEvent>(CreateEvent, 'tijdprikker_SlackNotifier');           
             routing.routeToEndpoint<messages.commands.CreateEvent>(messages.commands.CreateEvent, 'dev-simplequeue');
             routing.routeToEndpoint<messages.commands.BakeCake>(messages.commands.BakeCake, 'dev-simplequeue');
-            routing.routeToTopic<messages.events.CakeBaked>(messages.events.CakeBaked, 'dev-CakeBaked')
+            routing.routeToTopic<messages.events.CakeBaked>(messages.events.CakeBaked, 'dev-CakeBaked');
         });
         endpoint.handlers(handling => {
             handling.handleMessages<messages.commands.CreateEvent>(messages.commands.CreateEvent, EventCreator)
@@ -46,7 +46,7 @@ export class Composer {
         });
         endpoint.customize(container => {
             container.bind(Symbol.for('NotificationService')).to(NotificationService);
-        })
+        });
 
         return endpoint.start();
         //return endpoint.sendOnly();

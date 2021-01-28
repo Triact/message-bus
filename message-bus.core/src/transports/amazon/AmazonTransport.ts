@@ -9,16 +9,16 @@ import AmazonConsumer from './AmazonConsumer';
 import { AmazonTransportImplementation } from './AmazonTransportImplementation';
 import { AmazonTransportOptions } from './AmazonTransportOptions';
 
-
 export class AmazonTransport implements interfaces.ITransport {
 
     private readonly _options: AmazonTransportOptions = new AmazonTransportOptions();
     
-    configure = (container: inversifyInterfaces.Container) => {
-        if (!container) throw new Error(`Argument 'container' cannot be null.`);
-        
-        container.bind(amazonInterfaces.TYPES.AmazonTransportOptions).toConstantValue(this._options);
-        container.bind(interfaces.TYPES.ITransportImplementation).to(AmazonTransportImplementation).inSingletonScope();
+    constructor(visitor: interfaces.ITransportConfigurationVisitor) {
+
+        visitor.configureTransport((container: inversifyInterfaces.Container) => {
+            container.bind(amazonInterfaces.TYPES.AmazonTransportOptions).toConstantValue(this._options);
+            container.bind(interfaces.TYPES.ITransportImplementation).to(AmazonTransportImplementation).inSingletonScope();
+        });
     }
 
     awsConfig = (awsConfig: AWS.Config, awsAccountId: string) :  AmazonTransport => {
@@ -30,8 +30,8 @@ export class AmazonTransport implements interfaces.ITransport {
         return this;
     }
 
-    useLambda = () : AmazonTransport => {
-        this._options.useLambda = true;
-        return this;
-    }
+    // useLambda = () : AmazonTransport => {
+    //     this._options.useLambda = true;
+    //     return this;
+    // }
 }

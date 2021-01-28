@@ -4,8 +4,10 @@ import FakeTransportImplementation from "./FakeTransportImplementation";
 
 export class FakeTransport implements interfaces.ITransport {
     
-    configure = (container: inversifyInterfaces.Container) => {
-        if (!container) throw new Error(`Argument 'container' cannot be null.`);
-        container.bind(interfaces.TYPES.ITransportImplementation).to(FakeTransportImplementation).inSingletonScope();
+    constructor(visitor: interfaces.ITransportConfigurationVisitor) {
+
+        visitor.configureTransport((container: inversifyInterfaces.Container) => {
+            container.bind(interfaces.TYPES.ITransportImplementation).to(FakeTransportImplementation).inSingletonScope();
+        });
     }
 }

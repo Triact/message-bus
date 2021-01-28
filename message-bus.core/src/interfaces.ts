@@ -15,9 +15,9 @@ export const TYPES = {
 }
 
 // Endpoint Configuration
-export interface IRoutingConfiguration extends IProvideRoutes {
+export interface IRoutingConfiguration { //extends IProvideRoutes {
+    routeToEndpoint<T>(ctor: new (...args: any[]) => T, queue: string): void;
     routeToTopic<T>(ctor: new (...args: any[]) => T, topic: string): void;
-    getDestination<T>(msg: T): { msgType: MessageType, topic: string };
 }
 
 export interface IHandlingConfiguration {
@@ -27,6 +27,7 @@ export interface IHandlingConfiguration {
 // Providers
 export interface IProvideRoutes {
     getRoutes(): RouteDefinition<IMessage>[];
+    getDestination<T>(msg: T): { msgType: MessageType, topic: string };
 }
 
 // Bus
@@ -41,12 +42,17 @@ interface IPublishMessages {
 export interface IBus extends ISendMessages, IPublishMessages {    
 }
 
+// Transports
 export interface ITransport {
-    configure(container: inversifyInterfaces.Container) : void;
 }
 
 export interface ITransportConfiguration {
 }
+
+export interface ITransportConfigurationVisitor {
+    configureTransport(callback: (container: inversifyInterfaces.Container) => void) : void;
+}
+
 
 export interface ITransportImplementation {
     publish<T>(msg: T, msgType: string | undefined, topic: string): void;
@@ -54,6 +60,7 @@ export interface ITransportImplementation {
     startListening(messageHandler: (msgType: MessageType, msg: any, context: IMessageContext) => void, createMessageContextCallback: () => MessageContext): void;
 }
 
+// Message Handling
 export interface IProvideMessageHandlers {
     getHandlersForMessageType<T>(msgType: MessageType): IHandleMessages<T>[];
 }
@@ -81,6 +88,7 @@ export class MessageMetadataKeys {
     static readonly MessageType: string = 'MessageType';
 }
 
+// Logging
 export interface ILogger {
     debug(text:string, ...data:any[]) : void;
     info(text:string, ...data:any[]) : void;

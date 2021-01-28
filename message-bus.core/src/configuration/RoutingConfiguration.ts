@@ -1,6 +1,6 @@
 import * as interfaces from '../interfaces';
 
-export default class RoutingConfiguration implements interfaces.IRoutingConfiguration {
+export default class RoutingConfiguration implements interfaces.IRoutingConfiguration, interfaces.IProvideRoutes {
 
     private routes: any = {};
 
