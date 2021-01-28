@@ -18,4 +18,4 @@ npm install @triact/message-bus.core
 
 [Messages](/docs/messages.md)
 
-[Message Handlers](/docs/message-handlers)
+[Message Handlers](/docs/message-handlers.md)
