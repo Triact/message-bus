@@ -6,6 +6,7 @@ import RoutingConfiguration from './configuration/RoutingConfiguration';
 import { FakeTransport } from './Index';
 import * as interfaces from './interfaces';
 import { ConsoleLogger } from './loggers/ConsoleLogger';
+import { TransportConfigurationVisitor } from './transports/TransportConfigurationVisitor';
 
 interface StartOptions {
     sendOnly?: boolean;
@@ -15,8 +16,9 @@ export default class Endpoint {
 
     private container: inversifyInterfaces.Container | undefined;
     private config = new EndpointConfiguration();
+    private transportConfigurationVisitor = new TransportConfigurationVisitor();
     private transport: interfaces.ITransport | undefined;
-    private loggerCtor: (new (...args: any[]) => interfaces.ILogger) | undefined;
+    private loggerCtor: (new (...args: any[]) => interfaces.ILogger) | undefined;    
     private handlersCallback: ((handling: interfaces.IHandlingConfiguration) => void) | undefined;
     private customizeCallback: ((container: inversifyInterfaces.Container) => void) | undefined;
 
@@ -33,8 +35,7 @@ export default class Endpoint {
 
     useTransport = <T extends interfaces.ITransport>(ctor: new (...args: any[])=> T, callback: (transport: T) => void) => {
         if (!ctor) throw new Error(`Argument 'ctor' cannot be null.`);
-
-        let transport = new ctor();
+        let transport = new ctor(this.transportConfigurationVisitor);
         callback(transport);
         this.transport = transport;        
     }
@@ -44,7 +45,7 @@ export default class Endpoint {
         this.loggerCtor = ctor;
     }
 
-    routes = (callback: (routing: RoutingConfiguration) => void) => {
+    routes = (callback: (routing: interfaces.IRoutingConfiguration) => void) => {
         if (!callback) throw Error(`Argument 'callback' cannot be null.`);
         callback(this.config.routing);
     }
@@ -62,14 +63,14 @@ export default class Endpoint {
         // Defaults
         if (!this.container) this.container = new Container();
         if (!this.loggerCtor) this.loggerCtor = ConsoleLogger;
-        if (!this.transport) this.transport = new FakeTransport();
+        if (!this.transport) this.transport = new FakeTransport(this.transportConfigurationVisitor);
         // End defaults
 
         this.container.bind<IProvideEndpointConfiguration>(interfaces.TYPES.IProvideEnpointConfiguration).toConstantValue(this.config);
         this.container.bind<Bus>(interfaces.TYPES.Bus).to(Bus).inSingletonScope();
         this.container.bind<interfaces.ILogger>(interfaces.TYPES.ILogger).to(this.loggerCtor).inSingletonScope();
-        
-        this.transport.configure(this.container);
+                
+        this.transportConfigurationVisitor.configure(this.container);
         
         let handling = new HandlingConfiguration(this.container);
         this.container.bind(interfaces.TYPES.IProvideMessageHandlers).toConstantValue(handling);
