@@ -1,4 +1,4 @@
-import { command, interfaces } from 'message-bus.core';
+import { command, interfaces } from '@triact/message-bus.core';
 
 @command(Symbol.for('CreateEvent'))
 export class CreateEvent implements interfaces.IMessage {

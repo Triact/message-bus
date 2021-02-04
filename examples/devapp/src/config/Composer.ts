@@ -1,11 +1,10 @@
+import { Endpoint, FakeTransport, interfaces, RabbitMQTransport } from '@triact/message-bus.core';
 import * as AWS from 'aws-sdk';
 import { Container } from "inversify";
-import { Endpoint, FakeTransport, AmazonTransport, interfaces } from 'message-bus.core';
-import Bakery from '../handlers/Bakery';
+//import Bakery from '../handlers/Bakery';
 import EventCreator from '../handlers/EventCreator';
+import { CreateEvent } from '../messages/commands';
 import NotificationService from '../services/NotificationService';
-import * as messages from '../messages/messages';
-import { TYPES } from "./types";
 
 export class Composer {
 
@@ -26,23 +25,25 @@ export class Composer {
 
         const endpoint = new Endpoint('dev-simplequeue');
         endpoint.useExistingContainer(this.container);
-        endpoint.useTransport<AmazonTransport>(AmazonTransport, transport => {
-            transport
-                .awsConfig(awsConfig, process.env.AWS_ACCOUNT_ID as string);
-        });
+        // endpoint.useTransport<AmazonTransport>(AmazonTransport, transport => {
+        //     transport
+        //         .awsConfig(awsConfig, process.env.AWS_ACCOUNT_ID as string);
+        // });
         endpoint.useTransport<FakeTransport>(FakeTransport, transport => {
             
         });
+        endpoint.useTransport<RabbitMQTransport>(RabbitMQTransport, transport =>{
+            transport.configure('amqp://localhost');
+        })
         endpoint.routes(routing => {
+            
             //routing.routeToTopic<EventCreated>(EventCreated, 'tijdprikker_event-created');
             //routing.routeToEndpoint<CreateEvent>(CreateEvent, 'tijdprikker_SlackNotifier');           
-            routing.routeToEndpoint<messages.commands.CreateEvent>(messages.commands.CreateEvent, 'dev-simplequeue');
-            routing.routeToEndpoint<messages.commands.BakeCake>(messages.commands.BakeCake, 'dev-simplequeue');
-            routing.routeToTopic<messages.events.CakeBaked>(messages.events.CakeBaked, 'dev-CakeBaked');
+            routing.routeToEndpoint<CreateEvent>(CreateEvent, 'dev-simplequeue');
         });
         endpoint.handlers(handling => {
-            handling.handleMessages<messages.commands.CreateEvent>(messages.commands.CreateEvent, EventCreator)
-            handling.handleMessages<messages.commands.BakeCake>(messages.commands.BakeCake, Bakery);
+            handling.handleMessages<CreateEvent>(CreateEvent, EventCreator)
+            //handling.handleMessages<messages.commands.BakeCake>(messages.commands.BakeCake, Bakery);
         });
         endpoint.customize(container => {
             container.bind(Symbol.for('NotificationService')).to(NotificationService);

@@ -1,6 +1,5 @@
-import { inject, injectable } from 'inversify';
-import { interfaces } from 'message-bus.core';
-import NotificationService from '../services/NotificationService';
+import { interfaces } from '@triact/message-bus.core';
+import { injectable } from 'inversify';
 import * as messages from '../messages/messages';
 
 @injectable()
