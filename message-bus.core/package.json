@@ -1,10 +1,10 @@
 {
   "name": "@triact/message-bus.core",
-  "version": "0.1.1-alpha.4",
+  "version": "0.1.1-alpha.5",
   "description": "",
   "author": "triact",
-  "main": "./lib/csj/index.js",
-  "module": "./lib/esm/index.js",
+  "main": "./lib/csj/Index.js",
+  "module": "./lib/esm/Index.js",
   "repository": {
     "url": "git@github.com:Triact/message-bus.git"
   },
