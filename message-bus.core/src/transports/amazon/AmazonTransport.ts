@@ -8,16 +8,18 @@ import * as amazonInterfaces from './interfaces';
 import AmazonConsumer from './AmazonConsumer';
 import { AmazonTransportImplementation } from './AmazonTransportImplementation';
 import { AmazonTransportOptions } from './AmazonTransportOptions';
+import { AmazonInstaller } from './AmazonInstaller';
 
 export class AmazonTransport implements interfaces.ITransport {
 
-    private readonly _options: AmazonTransportOptions = new AmazonTransportOptions();
+    private readonly options: AmazonTransportOptions = new AmazonTransportOptions();
     
     constructor(visitor: interfaces.ITransportConfigurationVisitor) {
 
         visitor.configureTransport((container: inversifyInterfaces.Container) => {
-            container.bind(amazonInterfaces.TYPES.AmazonTransportOptions).toConstantValue(this._options);
+            container.bind(amazonInterfaces.TYPES.AmazonTransportOptions).toConstantValue(this.options);
             container.bind(interfaces.TYPES.ITransportImplementation).to(AmazonTransportImplementation).inSingletonScope();
+            container.bind(interfaces.TYPES.ITransportInstaller).to(AmazonInstaller).inSingletonScope();
         });
     }
 
@@ -25,8 +27,8 @@ export class AmazonTransport implements interfaces.ITransport {
         if (!awsConfig) throw new Error(`Argument 'awsConfig' cannot be null.`);
         if (!awsAccountId) throw new Error(`Argument 'awsAccountId' cannot be null.`);
 
-        this._options.awsConfig = awsConfig;
-        this._options.awsAccountId = awsAccountId;
+        this.options.awsConfig = awsConfig;
+        this.options.awsAccountId = awsAccountId;
         return this;
     }
 

@@ -9,7 +9,9 @@ export const TYPES = {
     Bus: Symbol.for('Bus'),
     ITransport: Symbol.for('ITransport'),
     ITransportImplementation: Symbol.for('ITransportImplementation'),
+    ITransportInstaller: Symbol.for('ITransportInstaller'),
     MessageHandler: Symbol.for('MessageHandler'),
+    IProvideRoutes: Symbol.for('IProvideRoutes'),
     IProvideMessageHandlers: Symbol.for('IProvideMessageHandlers'),
     ILogger: Symbol.for('ILogger')
 }
@@ -53,11 +55,14 @@ export interface ITransportConfigurationVisitor {
     configureTransport(callback: (container: inversifyInterfaces.Container) => void) : void;
 }
 
-
 export interface ITransportImplementation {
     publish<T>(msg: T, msgType: string | undefined, topic: string): void;
     send<T>(msg: T, msgType: string | undefined, queue: string): void;
     startListening(messageHandler: (msgType: MessageType, msg: any, context: IMessageContext) => void, createMessageContextCallback: () => MessageContext): void;
+}
+
+export interface ITransportInstaller {
+    install(): void;
 }
 
 // Message Handling

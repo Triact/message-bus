@@ -9,20 +9,24 @@ export default class Bus implements interfaces.IBus {
 
     private _endpointConfigProvider: IProvideEndpointConfiguration;
     private _transportImplementation: interfaces.ITransportImplementation;
+    private _routeProvider: interfaces.IProvideRoutes;
     private _messageHandlerProvider: interfaces.IProvideMessageHandlers;
     private _logger: interfaces.ILogger;
 
     constructor(
         @inject(interfaces.TYPES.IProvideEnpointConfiguration) endpointConfigurationProvider: IProvideEndpointConfiguration,
         @inject(interfaces.TYPES.ITransportImplementation) transportImplementation: interfaces.ITransportImplementation,
+        @inject(interfaces.TYPES.IProvideRoutes) routeProvider: interfaces.IProvideRoutes,
         @inject(interfaces.TYPES.IProvideMessageHandlers) messageHandlerProvider: interfaces.IProvideMessageHandlers,
         @inject(interfaces.TYPES.ILogger) logger: interfaces.ILogger
     ) {    
         if (!endpointConfigurationProvider) throw new Error(`Argument 'endpointConfigurationProvider' cannot be null.`);
         if (!transportImplementation) throw new Error(`Argument 'transportImplementation' cannot be null.`);
+        if (!routeProvider) throw new Error(`Argument 'routeProvider' cannot be null.`);
         if (!messageHandlerProvider) throw new Error(`Argument 'messageHandlerProvider' cannot be null.`);
 
         this._endpointConfigProvider = endpointConfigurationProvider;
+        this._routeProvider = routeProvider;
         this._transportImplementation = transportImplementation;
         this._messageHandlerProvider = messageHandlerProvider;
         this._logger = logger;
@@ -43,7 +47,7 @@ export default class Bus implements interfaces.IBus {
 
         populateMessageCallback(msg);
 
-        const dest = this._endpointConfigProvider.routing.getDestination<T>(msg);
+        const dest = this._routeProvider.getDestination<T>(msg);
         let msgType = this.getMessageTypeAsString(dest.msgType);
 
         this._transportImplementation.publish(msg, msgType, dest.topic);
@@ -59,7 +63,7 @@ export default class Bus implements interfaces.IBus {
 
         populateMessageCallback(msg);
 
-        const dest = this._endpointConfigProvider.routing.getDestination<T>(msg);
+        const dest = this._routeProvider.getDestination<T>(msg);
         let msgType = this.getMessageTypeAsString(dest.msgType);
 
         this._transportImplementation.send(msg, msgType, dest.topic);

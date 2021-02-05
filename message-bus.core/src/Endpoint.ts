@@ -18,7 +18,8 @@ export default class Endpoint {
     private config = new EndpointConfiguration();
     private transportConfigurationVisitor = new TransportConfigurationVisitor();
     private transport: interfaces.ITransport | undefined;
-    private loggerCtor: (new (...args: any[]) => interfaces.ILogger) | undefined;    
+    private loggerCtor: (new (...args: any[]) => interfaces.ILogger) | undefined;  
+    private routesCallback: ((handling: interfaces.IRoutingConfiguration)  => void) | undefined;
     private handlersCallback: ((handling: interfaces.IHandlingConfiguration) => void) | undefined;
     private customizeCallback: ((container: inversifyInterfaces.Container) => void) | undefined;
 
@@ -47,7 +48,7 @@ export default class Endpoint {
 
     routes = (callback: (routing: interfaces.IRoutingConfiguration) => void) => {
         if (!callback) throw Error(`Argument 'callback' cannot be null.`);
-        callback(this.config.routing);
+        this.routesCallback = callback;
     }
 
     customize = (callback: (container: inversifyInterfaces.Container) => void) => {
@@ -72,6 +73,12 @@ export default class Endpoint {
                 
         this.transportConfigurationVisitor.configure(this.container);
         
+        let routing = new RoutingConfiguration();
+        if (this.routesCallback) {
+            this.routesCallback(routing);
+        }
+        this.container.bind(interfaces.TYPES.IProvideRoutes).toConstantValue(routing);
+
         let handling = new HandlingConfiguration(this.container);
         this.container.bind(interfaces.TYPES.IProvideMessageHandlers).toConstantValue(handling);
 
@@ -85,10 +92,20 @@ export default class Endpoint {
         // customization
         if (this.customizeCallback) this.customizeCallback(this.container);
 
-        var logger = this.container.get<interfaces.ILogger>(interfaces.TYPES.ILogger);
-        logger.info('Starting endpoint...');
+        let logger = this.container.get<interfaces.ILogger>(interfaces.TYPES.ILogger);
 
-        var bus = this.container.get<Bus>(interfaces.TYPES.Bus);
+        // transport installation
+        
+        if (this.container.isBound(interfaces.TYPES.ITransportInstaller)) {
+            logger.debug('Installing transport...');
+            let transportInstaller = this.container.get<interfaces.ITransportInstaller>(interfaces.TYPES.ITransportInstaller);
+            transportInstaller.install();
+            logger.debug('Transport installation complered.');
+        }
+
+        logger.debug('Starting endpoint...');
+
+        let bus = this.container.get<Bus>(interfaces.TYPES.Bus);
 
         //if (options.sendOnly && this.config.handling.areRegistered()) 
         //    throw new Error('Registering handlers is not supported when running in SendOnly mode.');

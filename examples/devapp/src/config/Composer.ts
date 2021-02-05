@@ -24,15 +24,15 @@ export class Composer {
             region: process.env.AWS_REGION
         });
 
-        const endpoint = new Endpoint('dev-simplequeue');
+        const endpoint = new Endpoint('dev-simplequeue-1');
         endpoint.useExistingContainer(this.container);
         endpoint.useTransport<AmazonTransport>(AmazonTransport, transport => {
             transport
                 .awsConfig(awsConfig, process.env.AWS_ACCOUNT_ID as string);
         });
-        endpoint.useTransport<FakeTransport>(FakeTransport, transport => {
+        // endpoint.useTransport<FakeTransport>(FakeTransport, transport => {
             
-        });
+        // });
         endpoint.routes(routing => {
             //routing.routeToTopic<EventCreated>(EventCreated, 'tijdprikker_event-created');
             //routing.routeToEndpoint<CreateEvent>(CreateEvent, 'tijdprikker_SlackNotifier');           

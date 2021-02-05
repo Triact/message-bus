@@ -1,11 +1,10 @@
 import { inject, injectable, interfaces as inversifyInterfaces } from 'inversify';
-import { IHandleMessages } from 'message-bus.core/dist/interfaces';
 import NotificationService from '../services/NotificationService';
 import { interfaces } from 'message-bus.core';
 import * as messages from '../messages/messages';
 
 @injectable()
-export default class Bakery implements IHandleMessages<messages.commands.BakeCake> {
+export default class Bakery implements interfaces.IHandleMessages<messages.commands.BakeCake> {
     
     private notificationService: NotificationService;
 

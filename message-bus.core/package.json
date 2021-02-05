@@ -11,7 +11,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "clean": "IF exist lib (rmdir /q /s lib) && mkdir lib",
-    "dev": "tsc -p tsconfig.json -w",
+    "dev": "tsc -p tsconfig-csj.json -w",
     "build": "tsc -p tsconfig.json && tsc -p tsconfig-csj.json",
     "prepublish": "npm run clean && npm run build",
     "refreshVSToken": "vsts-npm-auth -C .npmrc -T .npmrc"
