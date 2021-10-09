@@ -50,8 +50,8 @@ export class AmazonTransportImplementation implements interfaces.ITransportImple
         this.consumer.start();
     }
 
-    publish = <T>(msg: T, msgType: string, topic: string) => {
-        this.sns.publish({
+    publish = async <T>(msg: T, msgType: string, topic: string) : Promise<void>=> {
+        await this.sns.publish({
             Message: JSON.stringify(msg),
             TopicArn: `arn:aws:sns:${this.options.awsConfig.region}:${this.options.awsAccountId}:${topic}`,
             MessageAttributes: {
@@ -60,11 +60,11 @@ export class AmazonTransportImplementation implements interfaces.ITransportImple
             }
         }, (error: AWS.AWSError, data: AWS.SNS.PublishResponse) => {
             if (error) this.logger.error("Error publishing message to SNS topic.", error);
-        });
+        }).promise();
     }
 
-    send = <T>(msg: T, msgType: string, queue: string) => {
-        let params = {
+    send = async <T>(msg: T, msgType: string, queue: string) : Promise<void> => {
+        const params = {
             DelaySeconds: 0,
             MessageAttributes: {
                 'MessageBus.MessageType': { DataType: 'String', StringValue: msgType },
@@ -73,8 +73,8 @@ export class AmazonTransportImplementation implements interfaces.ITransportImple
             MessageBody: JSON.stringify(msg),
             QueueUrl: `https://sqs.${this.options.awsConfig.region}.amazonaws.com/${this.options.awsAccountId}/${queue}`
         } as AWS.SQS.SendMessageRequest;
-        this.sqs.sendMessage(params, (error, data) => {
+        await this.sqs.sendMessage(params, (error, data) => {
             if (error) this.logger.error('Error sending message to SQS queue.', error);
-        });
+        }).promise();
     }
 }

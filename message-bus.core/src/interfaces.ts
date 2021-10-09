@@ -55,8 +55,8 @@ export interface ITransportConfigurationVisitor {
 
 
 export interface ITransportImplementation {
-    publish<T>(msg: T, msgType: string | undefined, topic: string): void;
-    send<T>(msg: T, msgType: string | undefined, queue: string): void;
+    publish<T>(msg: T, msgType: string | undefined, topic: string): Promise<void>;
+    send<T>(msg: T, msgType: string | undefined, queue: string): Promise<void>;
     startListening(messageHandler: (msgType: MessageType, msg: any, context: IMessageContext) => void, createMessageContextCallback: () => MessageContext): void;
 }
 
