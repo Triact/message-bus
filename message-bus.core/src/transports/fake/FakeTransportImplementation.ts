@@ -14,11 +14,11 @@ export default class FakeTransportImplementation implements ITransportImplementa
         this.logger = logger;
     }
 
-    publish<T>(msg: T, msgType: string | undefined, topic: string): void {
+    async publish<T>(msg: T, msgType: string | undefined, topic: string): Promise<void> {
         this.logger.info(`FakeTransport: publishing message:${msgType} to topic:${topic}`, msg);
     }
 
-    send<T>(msg: T, msgType: string | undefined, queue: string): void {
+    async send<T>(msg: T, msgType: string | undefined, queue: string): Promise<void> {
         this.logger.info(`FakeTransport: sending message:${msgType} to queue:${queue}`, msg);
     }
 
