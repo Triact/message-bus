@@ -32,11 +32,11 @@ export interface IProvideRoutes {
 
 // Bus
 interface ISendMessages {
-    send<T>(msgCtor: new (...args: any[]) => T, populateMessageCallback: (m: T) => void): void;
+    send<T>(msgCtor: new (...args: any[]) => T, populateMessageCallback: (m: T) => void): Promise<void>;
 } 
 
 interface IPublishMessages {
-    publish<T>(msgCtor: new (...args: any[]) => T, populateMessageCallback: (m: T) => void): void;
+    publish<T>(msgCtor: new (...args: any[]) => T, populateMessageCallback: (m: T) => void): Promise<void>;
 }
 
 export interface IBus extends ISendMessages, IPublishMessages {    
@@ -57,7 +57,7 @@ export interface ITransportConfigurationVisitor {
 export interface ITransportImplementation {
     publish<T>(msg: T, msgType: string | undefined, topic: string): Promise<void>;
     send<T>(msg: T, msgType: string | undefined, queue: string): Promise<void>;
-    startListening(messageHandler: (msgType: MessageType, msg: any, context: IMessageContext) => void, createMessageContextCallback: () => MessageContext): void;
+    startListening(messageHandler: (msgType: MessageType, msg: any, context: IMessageContext) => Promise<void>, createMessageContextCallback: () => MessageContext): void;
 }
 
 // Message Handling

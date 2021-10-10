@@ -33,7 +33,7 @@ export default class Bus implements interfaces.IBus {
         this._transportImplementation.startListening(this.handleMessage, this.createMessageContext);
     }
 
-    publish = <T>(msgCtor: new (...args: any[]) => T, populateMessageCallback: (m:T) => void) => {
+    publish = async <T>(msgCtor: new (...args: any[]) => T, populateMessageCallback: (m:T) => void) => {
         if (!msgCtor) throw new Error(`Argument 'ctor' cannot be null.`);
         if (!populateMessageCallback) throw new Error(`Argument 'populateMessageCallback' cannot be null`);
         
@@ -46,10 +46,10 @@ export default class Bus implements interfaces.IBus {
         const dest = this._endpointConfigProvider.routing.getDestination<T>(msg);
         let msgType = this.getMessageTypeAsString(dest.msgType);
 
-        this._transportImplementation.publish(msg, msgType, dest.topic);
+        await this._transportImplementation.publish(msg, msgType, dest.topic);
     }
 
-    send = <T>(msgCtor: new (...args: any[]) => T, populateMessageCallback: (m: T) => promise<void) => {
+    send = async <T>(msgCtor: new (...args: any[]) => T, populateMessageCallback: (m: T) => void) => {
         if (!msgCtor) throw new Error(`Argument 'ctor' cannot be null.`);
         if (!populateMessageCallback) throw new Error(`Argument 'populateMessageCallback' cannot be null`);
         
@@ -62,12 +62,12 @@ export default class Bus implements interfaces.IBus {
         const dest = this._endpointConfigProvider.routing.getDestination<T>(msg);
         let msgType = this.getMessageTypeAsString(dest.msgType);
 
-        this._transportImplementation.send(msg, msgType, dest.topic);
+        await this._transportImplementation.send(msg, msgType, dest.topic);
     }
 
-    private handleMessage = (msgType: interfaces.MessageType, msg: any, context: interfaces.IMessageContext) => {
+    private handleMessage = async (msgType: interfaces.MessageType, msg: any, context: interfaces.IMessageContext) => {
         let handlers = this._messageHandlerProvider.getHandlersForMessageType(msgType);        
-        handlers.map(h => h.handle(msg, context));
+        handlers.forEach(h => h.handle(msg, context));
     }
 
     private createMessageContext = () : MessageContext => {

@@ -14,14 +14,14 @@ export default class MessageContext implements interfaces.IMessageContext {
     //#region IMessageContext implementation
     messageHeaders: interfaces.MessageHeaderMap = {}
 
-    send<T>(msgCtor: new (...args: any[]) => T, populateMessageCallback: (m: T) => void): void {
+    async send<T>(msgCtor: new (...args: any[]) => T, populateMessageCallback: (m: T) => void): Promise<void> {
         if (!msgCtor) throw new Error(`Argument 'ctor' cannot be null.`);
         if (!populateMessageCallback) throw new Error(`Argument 'populateMessageCallback' cannot be null`);
 
         this.bus.send(msgCtor, populateMessageCallback)
     }
 
-    publish<T>(msgCtor: new (...args: any[]) => T, populateMessageCallback: (m: T) => void): void {
+    async publish<T>(msgCtor: new (...args: any[]) => T, populateMessageCallback: (m: T) => void): Promise<void> {
         if (!msgCtor) throw new Error(`Argument 'ctor' cannot be null.`);
         if (!populateMessageCallback) throw new Error(`Argument 'populateMessageCallback' cannot be null`);
 

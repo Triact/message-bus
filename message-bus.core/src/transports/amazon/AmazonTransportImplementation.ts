@@ -35,7 +35,7 @@ export class AmazonTransportImplementation implements interfaces.ITransportImple
     }
     
     startListening = (
-        messageReceivedCallback: (msgType: interfaces.MessageType, msg: any, context: interfaces.IMessageContext) => void,
+        messageReceivedCallback: (msgType: interfaces.MessageType, msg: any, context: interfaces.IMessageContext) => Promise<void>,
         createMessageContextCallbak: () => MessageContext
     ) => {
         if (this.consumer) throw new Error('Already started');
@@ -58,8 +58,6 @@ export class AmazonTransportImplementation implements interfaces.ITransportImple
                 'MessageBus.MessageType': { DataType: 'String', StringValue: msgType },
                 'MessageBus.TimeSent': { DataType: 'String', StringValue: new Date().toISOString()}
             }
-        }, (error: AWS.AWSError, data: AWS.SNS.PublishResponse) => {
-            if (error) this.logger.error("Error publishing message to SNS topic.", error);
         }).promise();
     }
 
@@ -73,8 +71,6 @@ export class AmazonTransportImplementation implements interfaces.ITransportImple
             MessageBody: JSON.stringify(msg),
             QueueUrl: `https://sqs.${this.options.awsConfig.region}.amazonaws.com/${this.options.awsAccountId}/${queue}`
         } as AWS.SQS.SendMessageRequest;
-        await this.sqs.sendMessage(params, (error, data) => {
-            if (error) this.logger.error('Error sending message to SQS queue.', error);
-        }).promise();
+        await this.sqs.sendMessage(params).promise();
     }
 }

@@ -5,7 +5,7 @@ import MessageContext from '../../MessageContext';
 interface AmazonConsumerOptions {
     sqs: SQS;
     queueUrl: string;
-    messageHandler: (msgType: interfaces.MessageType, msg: any, context: interfaces.IMessageContext) => void,
+    messageHandler: (msgType: interfaces.MessageType, msg: any, context: interfaces.IMessageContext) => Promise<void>,
     createMessageContextCallback: () => MessageContext,
     logger: interfaces.ILogger
 }
